@@ -37,7 +37,7 @@ public class DefaultConsoleLauncher {
 
     // Create a model (read only access) for the provided game parameters
     ModelFactory modelFactory =
-        new ModelFactory(); // TODO: Create this class in YOUR package and import/use it here.
+        new StarModelFactory(); // TODO: Create this class in YOUR package and import/use it here.
     ModelReadOnly model = modelFactory.createModel(baseSize, playerNames);
 
     // Visualize initial model state
