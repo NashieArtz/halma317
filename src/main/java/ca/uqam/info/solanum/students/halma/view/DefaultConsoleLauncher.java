@@ -37,7 +37,7 @@ public class DefaultConsoleLauncher {
     String[] playerNames = new String[] {"Max", "Maram", "Roman"};
 
     // Create a model (read only access) for the provided game parameters
-    ModelFactory modelFactory = new StarModelFactory(); // TODO: Create this class in YOUR package and import/use it here.
+    ModelFactory modelFactory = new StarModelFactory();
     ModelReadOnly model = modelFactory.createModel(baseSize, playerNames);
 
     // Visualize initial model state
