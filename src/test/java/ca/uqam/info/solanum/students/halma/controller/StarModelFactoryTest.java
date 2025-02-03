@@ -11,8 +11,6 @@ public class StarModelFactoryTest extends AbstractStarModelFactoryTest {
   @Override
   public ModelFactory getModelFactory() {
 
-    // TODO: Provide new Model factory object (your implementation).
-    // Example (your factory constructor may be different)
-    // return new ModelFactory();
+    return null;
   }
 }

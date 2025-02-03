@@ -1,80 +1,84 @@
 package ca.uqam.info.solanum.students.halma.model;
 
+
 import ca.uqam.info.solanum.inf2050.f24halma.model.Board;
 import ca.uqam.info.solanum.inf2050.f24halma.model.Field;
 
+import java.util.HashSet;
+
 import java.util.Set;
 
+import static ca.uqam.info.solanum.students.halma.controller.StarModelFactory.baseSize;
+
+
+/**
+ * Implémentation du plateau de jeu
+ */
 public class BoardImpl implements Board {
+
     /**
-     * Getter for all fields contained in the board instance.
-     *
-     * @return unmodifiable set of all board fields.
+     * Retourne les cases jouables du plateau
+     * @return un ensemble de cases valides
      */
     @Override
     public Set<Field> getAllFields() {
-        return Set.of();
+        Set<Field> EmptyFields = new HashSet<>();
+
+        int nbrColonne = 4 * baseSize + 1;
+        int nbrLignes = 6 * baseSize + 1;
+
+        String[][] board = new String[nbrColonne][nbrLignes];
+
+        // Parcours les cases possibles du plateau
+        for (int y = 0; y < board[0].length; y++) {
+            for (int x = 0; x < board.length; x++) {
+
+                if (baseSize % 2 == (x + y) % 2) {
+                    // Vérifie si la case est dans la zone de jeu
+                    if ((x > baseSize - 1 && (y >= x - baseSize && y <= board[0].length - x + baseSize)) ||
+                            (x <= board.length - baseSize - 1 && (y >= board.length - baseSize - x - 1 &&
+                                    y <= board[0].length - (board.length - x - baseSize)))) {
+                        EmptyFields.add(new Field(x, y));
+                    }
+                }
+            }
+        }
+        return EmptyFields;
     }
 
-    /**
-     * Getter for all home fields on the given board instance, for a given player specified by index.
-     *
-     * @param playerIndex as the player for whom we want to look up the home fields. Consecutive pairs
-     *                    of an even then an odd player indexes always have opposing home zones.
-     * @return unmodifiable set of all the player's home fields.
-     */
     @Override
-    public Set<Field> getHomeFieldsForPlayer(int playerIndex) {
-        return Set.of();
-    }
+    public Set<Field> getHomeFieldsForPlayer(int i) {return Set.of();}
 
     /**
-     * Getter for all home fields on the board, regardless of player affiliation.
-     *
-     * @return unmodifiable set of all home fields
+     * Retourne les cases de départ
+     * @return ensemble de cases de départ
      */
     @Override
     public Set<Field> getAllHomeFields() {
-        return Set.of();
+        Set<Field> PlayerFields = new HashSet<>();
+
+        // nbr de colonne
+        int x = baseSize * 4 + 1;
+        // nbr de ligne
+        int y = baseSize * 6 + 1;
+
+        // Définit les positions de départ des joueurs
+        PlayerFields.add(new Field(0, y/2));
+        PlayerFields.add(new Field(x/3, y-1));
+        PlayerFields.add(new Field(x/3, 0));
+        PlayerFields.add(new Field(x-1,baseSize*3));
+        PlayerFields.add(new Field(baseSize*3, baseSize*6));
+        PlayerFields.add(new Field(x/3 + baseSize * 2,0));
+
+        return PlayerFields;
     }
 
-    /**
-     * Getter for all target fields on the given board instance, for a given player specified by
-     * index.
-     *
-     * @param playerIndex as the player for whom we want to look up the target fields. Consecutive
-     *                    pairs of an even then an odd player indexes always have opposing target
-     *                    zones.
-     * @return unmodifiable set of all the player's target fields.
-     */
     @Override
-    public Set<Field> getTargetFieldsForPlayer(int playerIndex) {
-        return Set.of();
-    }
+    public Set<Field> getTargetFieldsForPlayer(int i) {return Set.of();}
 
-    /**
-     * Getter for neighboured fields, that is, fields that are directly connected to the given field
-     * object.
-     *
-     * @param field as entity on the board for which a set of neighbours must be determined.
-     * @return unmodifiable set of all directly connected field objects.
-     */
     @Override
-    public Set<Field> getNeighbours(Field field) {
-        return Set.of();
-    }
+    public Set<Field> getNeighbours(Field field) {return Set.of();}
 
-    /**
-     * Getter for extended neighbour, that is the neighbour of a neighbour that lies on a straight
-     * line, starting from the given field.
-     *
-     * @param origin    as field on the board for which a potential extended neighbour is determined.
-     * @param neighbour as a direct neighbour of the origin field, defining direction of the extended
-     *                  neighbour.
-     * @return Field defining extended neighbour of origin. May be null.
-     */
     @Override
-    public Field getExtendedNeighbour(Field origin, Field neighbour) {
-        return null;
-    }
+    public Field getExtendedNeighbour(Field field, Field field1) {return null;}
 }
