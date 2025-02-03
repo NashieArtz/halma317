@@ -2,6 +2,8 @@ package ca.uqam.info.solanum.students.halma.controller;
 
 import ca.uqam.info.solanum.inf2050.f24halma.controller.ModelFactory;
 import ca.uqam.info.solanum.inf2050.f24halma.model.Model;
+import ca.uqam.info.solanum.students.halma.model.BoardImpl;
+import ca.uqam.info.solanum.students.halma.model.ModelImpl;
 
 public class StarModelFactory implements ModelFactory {
     /**
@@ -19,6 +21,11 @@ public class StarModelFactory implements ModelFactory {
      */
     @Override
     public Model createModel(int baseSize, String[] players) {
+        ModelImpl model = new ModelImpl();
+        BoardImpl board = new BoardImpl();
+
+        board.getAllFields().forEach(field -> {});
+        model.getCurrentPlayer();
         return null;
     }
 }

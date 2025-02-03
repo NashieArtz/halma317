@@ -3,6 +3,7 @@ package ca.uqam.info.solanum.students.halma.view;
 import ca.uqam.info.solanum.inf2050.f24halma.controller.ModelFactory;
 import ca.uqam.info.solanum.inf2050.f24halma.model.ModelReadOnly;
 import ca.uqam.info.solanum.inf2050.f24halma.view.TextualVisualizer;
+import ca.uqam.info.solanum.students.halma.controller.StarModelFactory;
 
 // TODO: create something implementing ModelFactory in controller package, and import it here
 
@@ -36,8 +37,7 @@ public class DefaultConsoleLauncher {
     String[] playerNames = new String[] {"Max", "Maram", "Roman"};
 
     // Create a model (read only access) for the provided game parameters
-    ModelFactory modelFactory =
-        new StarModelFactory(); // TODO: Create this class in YOUR package and import/use it here.
+    ModelFactory modelFactory = new StarModelFactory(); // TODO: Create this class in YOUR package and import/use it here.
     ModelReadOnly model = modelFactory.createModel(baseSize, playerNames);
 
     // Visualize initial model state
@@ -46,11 +46,9 @@ public class DefaultConsoleLauncher {
     System.out.println(visualizer.stringifyModel(model));
   }
 
-  private static void runTp02() {
-    // Will be released with TP02 instructions.
-  }
+  //private static void runTp02() {
+    // Will be released with TP02 instructions.}
 
-  private static void runTp03() {
-    // Will be released with TP02 instructions.
-  }
+  //private static void runTp03() {
+    // Will be released with TP02 instructions.}
 }
