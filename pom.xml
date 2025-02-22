@@ -1,7 +1,7 @@
 <project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>ca.uqam.info.solanum.students</groupId>
+    <groupId>ca.uqam.info.solanum.max</groupId>
     <artifactId>halma</artifactId>
     <packaging>jar</packaging>
     <version>f24-1.1</version>
@@ -26,14 +26,14 @@
         <dependency>
             <groupId>ca.uqam.info.solanum</groupId>
             <artifactId>halmainterfaces</artifactId>
-            <version>f25-1.3</version>
+            <version>f25-1.4</version>
         </dependency>
 
         <!-- Provided abstract tests, as TEST scoped dependency -->
         <dependency>
             <groupId>ca.uqam.info.solanum</groupId>
             <artifactId>halmatests</artifactId>
-            <version>f25-1.3-tp1-regressed</version>
+            <version>f25-1.4-tp2-regressed</version>
             <scope>test</scope>
         </dependency>
 
@@ -45,6 +45,7 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
 
     <build>
         <!-- Override default name of generated jars -->
@@ -68,7 +69,31 @@
                 </configuration>
             </plugin>
 
-            <!-- PLUGINS -->
+            <!-- Plugin to refuse build in case of checkstyle violations-->
+            <!-- checkstyle result in : target//checkstyle-result.xml -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-checkstyle-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <configLocation>google_checks.xml</configLocation>
+                    <consoleOutput>true</consoleOutput>
+                    <violationSeverity>warning</violationSeverity>
+                    <failOnViolation>true</failOnViolation>
+                    <failsOnError>true</failsOnError>
+                    <linkXRef>false</linkXRef>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>validate</id>
+                        <phase>validate</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
             <!-- Plugin to ensure all functions are commented and generate javadoc -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -90,7 +115,8 @@
                     </execution>
                 </executions>
             </plugin>
-        </plugins>
 
+            <!-- MARKER for grading plugins. -->
+        </plugins>
     </build>
 </project>
