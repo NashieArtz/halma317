@@ -1,67 +1,59 @@
 package ca.uqam.info.solanum.students.halma.model;
 
-
-import ca.uqam.info.solanum.inf2050.f24halma.model.*;
-import ca.uqam.info.solanum.students.halma.controller.StarModelFactory;
-
+import ca.uqam.info.solanum.inf2050.f24halma.model.Field;
+import ca.uqam.info.solanum.inf2050.f24halma.model.FieldException;
+import ca.uqam.info.solanum.inf2050.f24halma.model.Model;
+import ca.uqam.info.solanum.inf2050.f24halma.model.ModelReadOnly;
 import java.util.Set;
 
 /**
- * Le type de Model
+ * Implémentation du modèle du jeu Halma.
+ * La classe gère les opérations du modèle comme l'occupation des cases par les joueurs.
  */
 public class ModelImpl implements Model, ModelReadOnly {
 
-    @Override
-    public void occupyField(int i, Field field) throws FieldException {}
+  /**
+   * Constructeur par défaut de ModelImpl.
+   */
+  public ModelImpl() {
+    // Default constructor
+  }
 
-    @Override
-    public void clearField(Field field) throws FieldException {}
+  @Override
+  public void occupyField(int i, Field field) throws FieldException {
+  }
 
-    @Override
-    public void setCurrentPlayer(int i) {}
+  @Override
+  public void clearField(Field field) throws FieldException {
+  }
 
-    /**
-     * Retourne le nom des joueurs
-     * @return tableau avec les noms
-     */
-    @Override
-    public String[] getPlayerNames() {
-        return new String[0];
-    }
+  @Override
+  public void setCurrentPlayer(int i) {
+  }
 
-    /**
-     * Retourne les cases occupés par un joueur
-     * @param playerIndex indice du joueur.
-     * @return ensemble contenant les cases occupées par le joueur
-     */
-    @Override
-    public Set<Field> getPlayerFields(int playerIndex) {
-        int baseSize = StarModelFactory.baseSize;
+  @Override
+  public String[] getPlayerNames() {
+    return new String[0];
+  }
 
-        Set<Field> player0Fields = Set.of(new Field(0, baseSize*3));
-        Set<Field> player1Fields = Set.of(new Field(baseSize*3, 0));
-        Set<Field> player2Fields = Set.of(new Field(baseSize*3, (baseSize*6)));
+  @Override
+  public Set<Field> getPlayerFields(int i) {
+    return Set.of();
+  }
 
-        return switch (playerIndex) {
-            case 0 -> player0Fields;
-            case 1 -> player1Fields;
-            case 2 -> player2Fields;
-            default -> Set.of();
-        };
-    }
+  @Override
+  public int getCurrentPlayer() {
+    return 0;
+  }
 
-    @Override
-    public int getCurrentPlayer() {
-        return 0;
-    }
+  @Override
+  public BoardImpl getBoard() {
+    return new BoardImpl();
+  }
 
-    /**
-     * Retourne l'instance du plateau
-     * @return instance de BoardImpl
-     */
-    @Override
-    public Board getBoard() {return new BoardImpl();}
-
-    @Override
-    public boolean isClear(Field field) throws FieldException {return false;}
+  @Override
+  public boolean isClear(Field field) throws FieldException {
+    return false;
+  }
 }
+

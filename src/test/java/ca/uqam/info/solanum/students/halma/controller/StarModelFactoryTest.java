@@ -4,13 +4,11 @@ import ca.uqam.info.solanum.inf2050.f24halma.controller.AbstractStarModelFactory
 import ca.uqam.info.solanum.inf2050.f24halma.controller.ModelFactory;
 
 /**
- * This class must be implemented by students.
+ * Classe de test pour StarModelFactory.
  */
 public class StarModelFactoryTest extends AbstractStarModelFactoryTest {
-
   @Override
   public ModelFactory getModelFactory() {
-
-    return null;
+    return new StarModelFactory();
   }
 }
