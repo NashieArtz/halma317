@@ -21,13 +21,10 @@ public class StarModelFactory implements ModelFactory {
    * Constructeur par défaut de StarModelFactory.
    */
   public StarModelFactory() {
-    // Default constructor.
   }
 
   @Override
-  public Model createModel(int i, String[] strings) {
-    baseSize = i;
-    playerNbr = strings.length;
-    return new ModelImpl();
+  public Model createModel(int baseSize, String[] playerNames) {
+    return new ModelImpl(baseSize, playerNames);
   }
 }
