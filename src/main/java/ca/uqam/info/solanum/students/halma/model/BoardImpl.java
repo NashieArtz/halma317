@@ -20,7 +20,7 @@ public class BoardImpl implements Board {
    * Constructeur par défaut de BoardImpl.
    * Initialise une instance du plateau de jeu.
    *
-   * @param baseSize TO REPLACE.
+   * @param baseSize largeur du jeu.
    */
   public BoardImpl(int baseSize) {
     this.baseSize = baseSize;
@@ -29,29 +29,20 @@ public class BoardImpl implements Board {
   @Override
   public Set<Field> getAllFields() {
     Set<Field> emptyFields = new HashSet<>();
-    int nbrColonne = 4 * baseSize + 1; // "width"
-    int nbrLignes = 6 * baseSize + 1; // "height"
-    for (int y = 0; y < nbrLignes; y++) {
-      for (int x = 0; x < nbrColonne; x++) {
-        // Keep checkerboard cells only:
+    int colonnes = 4 * baseSize + 1;
+    int lignes = 6 * baseSize + 1;
+    for (int y = 0; y < lignes; y++) {
+      for (int x = 0; x < colonnes; x++) {
         if ((baseSize % 2) == ((x + y) % 2)) {
-          // Split into 2 big lobes (top-right & bottom-left),
-          // so we get a star shape.
-          // 1) Top lobe: x >= baseSize, plus some Y bounds
-          boolean topLobe =
+          boolean pointeHaut =
               (x >= baseSize)
-                  // Lower bound on Y (shifted by -1 so we can include row=0 at x=4 for baseSize=3)
                   && (y >= x - baseSize - 1)
-                  // Upper bound on Y
-                  && (y <= (nbrLignes - 1) - x + baseSize);
-          // 2) Bottom lobe: x <= (nbrColonne - 1 - baseSize), plus some Y bounds
-          boolean bottomLobe =
-              (x <= (nbrColonne - 1 - baseSize))
-                  // Lower bound on Y
-                  && (y >= ((nbrColonne - 1) - baseSize) - x - 1)
-                  // Upper bound on Y
-                  && (y <= (nbrLignes - 1) - ((nbrColonne - 1 - x) - baseSize));
-          if (topLobe || bottomLobe) {
+                  && (y <= (lignes - 1) - x + baseSize);
+          boolean pointeBas =
+              (x <= (colonnes - 1 - baseSize))
+                  && (y >= ((colonnes - 1) - baseSize) - x - 1)
+                  && (y <= (lignes - 1) - ((colonnes - 1 - x) - baseSize));
+          if (pointeHaut || pointeBas) {
             emptyFields.add(new Field(x, y));
           }
         }
@@ -62,50 +53,75 @@ public class BoardImpl implements Board {
 
   @Override
   public Set<Field> getHomeFieldsForPlayer(int playerIndex) {
-    Set<Field> result = new HashSet<>();
-    int cols = 4 * baseSize + 1;
-    int rows = 6 * baseSize + 1;
+    Set<Field> homeField = new HashSet<>();
+    int colonnes = 4 * baseSize + 1;
+    int lignes = 6 * baseSize + 1;
     switch (playerIndex) {
       case 0:
-        result.add(new Field(0, baseSize));
-        result.add(new Field(1, baseSize - 1));
-        result.add(new Field(1, baseSize + 1));
+        // Pointe haut-gauche
+        homeField.add(new Field(baseSize, 0));
+        if (baseSize >= 2) {
+          homeField.add(new Field(baseSize - 1, 1));
+          homeField.add(new Field(baseSize, 2));
+          homeField.add(new Field(baseSize + 1, 1));
+        }
         break;
       case 1:
-        result.add(new Field(cols - 1, baseSize));
-        result.add(new Field(cols - 2, baseSize - 1));
-        result.add(new Field(cols - 2, baseSize + 1));
+        // Pointe haut-droite
+        homeField.add(new Field(colonnes - baseSize - 1, 0));
+        if (baseSize >= 2) {
+          homeField.add(new Field(colonnes - baseSize - 2, 1));
+          homeField.add(new Field(colonnes - baseSize - 1, 2));
+          homeField.add(new Field(colonnes - baseSize, 1));
+        }
         break;
       case 2:
-        result.add(new Field(0, rows - baseSize - 1));
-        result.add(new Field(1, rows - baseSize - 2));
-        result.add(new Field(1, rows - baseSize));
+        // Pointe gauche
+        homeField.add(new Field(0, lignes / 2));
+        if (baseSize >= 2) {
+          homeField.add(new Field(1, lignes / 2 + 1));
+          homeField.add(new Field(1, lignes / 2 - baseSize + 1));
+        }
         break;
       case 3:
-        result.add(new Field(cols - 1, rows - baseSize - 1));
-        result.add(new Field(cols - 2, rows - baseSize - 2));
-        result.add(new Field(cols - 2, rows - baseSize));
+        // Pointe bas-gauche
+        homeField.add(new Field(baseSize, lignes - 1));
+        if (baseSize >= 2) {
+          homeField.add(new Field(baseSize - 1, lignes - 2));
+          homeField.add(new Field(baseSize, lignes - 3));
+          homeField.add(new Field(baseSize + 1, lignes - 2));
+        }
         break;
       case 4:
-        result.add(new Field(baseSize, rows / 2));
+        // Pointe bas-droite
+        homeField.add(new Field(colonnes - baseSize - 1, lignes - 1));
+        if (baseSize >= 2) {
+          homeField.add(new Field(colonnes - baseSize - 2, lignes - 2));
+          homeField.add(new Field(colonnes - baseSize - 1, lignes - 3));
+          homeField.add(new Field(colonnes - baseSize, lignes - 2));
+        }
         break;
       case 5:
-        result.add(new Field(cols - baseSize - 1, rows / 2));
+        // Pointe droite
+        homeField.add(new Field(colonnes - 1, lignes / 2));
+        if (baseSize >= 2) {
+          homeField.add(new Field(colonnes - 2, lignes / 2 + 1));
+          homeField.add(new Field(colonnes - 2, lignes / 2 - baseSize + 1));
+        }
         break;
       default:
         break;
     }
-    return Collections.unmodifiableSet(result);
+    return Collections.unmodifiableSet(homeField);
   }
 
   @Override
   public Set<Field> getAllHomeFields() {
-    Set<Field> all = new HashSet<>();
-    // Suppose you have 3 players. Collect them:
-    for (int p = 0; p < 3; p++) {
-      all.addAll(getHomeFieldsForPlayer(p));
+    Set<Field> allHomeFields = new HashSet<>();
+    for (int i = 0; i < 6; i++) {
+      allHomeFields.addAll(getHomeFieldsForPlayer(i));
     }
-    return Collections.unmodifiableSet(all);
+    return Collections.unmodifiableSet(allHomeFields);
   }
 
   @Override
@@ -115,41 +131,63 @@ public class BoardImpl implements Board {
 
   @Override
   public Set<Field> getNeighbours(Field field) {
+    // Validation du field
     if (!getAllFields().contains(field)) {
-      // Some test expects FieldException for invalid fields:
-      throw new RuntimeException(
-          new FieldException("Field not in board: " + field.toString()));
+      throw new FieldException("Field pas sur le jeu " + field.toString());
     }
-    Set<Field> neighbors = new HashSet<>();
-    // For example, add (x±1, y), (x, y±1), (x±1, y±1):
+    // Coordonnées du field
     int x = field.x();
     int y = field.y();
-    // Example of 6 or 8 possible directions:
-    int[][] deltas = {
-        {-1, 0}, {1, 0}, {0, -1}, {0, 1},
-        {-1, -1}, {1, 1}, {-1, 1}, {1, -1}
+    // Directions possibles
+    int[][] directions = {
+        // Gauche
+        {-1, 0},
+        // Droite
+        {1, 0},
+        // Haut
+        {0, -1},
+        // Bas
+        {0, 1},
+        // Haut-Gauche
+        {-1, -1},
+        // Haut-Droite
+        {1, -1},
+        // Bas-Droite
+        {1, 1},
+        // Bas-Gauche
+        {-1, 1}
     };
-    for (int[] d : deltas) {
-      Field candidate = new Field(x + d[0], y + d[1]);
-      if (getAllFields().contains(candidate)) {
-        neighbors.add(candidate);
+    Set<Field> voisin = new HashSet<>();
+    for (int[] d : directions) {
+      // Calculer les coordoonées du voisin
+      int newX = x + d[0];
+      int newY = y + d[1];
+      Field voisinValide = new Field(newX, newY);
+      if (getAllFields().contains(voisinValide)) {
+        voisin.add(voisinValide);
       }
     }
-    return Collections.unmodifiableSet(neighbors);
+    return Collections.unmodifiableSet(voisin);
   }
 
   @Override
-  public Field getExtendedNeighbour(Field origin, Field via) {
-    if (!getAllFields().contains(origin)
-        || !getAllFields().contains(via)) {
-      throw new RuntimeException(
-          new FieldException("Invalid origin or via field: " + origin + " / " + via));
+  public Field getExtendedNeighbour(Field originField, Field voisinField) {
+    // Check validité originField et voisinField
+    if (!getAllFields().contains(originField)) {
+      throw new FieldException("Field originel invalide " + originField);
     }
-    int dx = via.x() - origin.x();
-    int dy = via.y() - origin.y();
-    Field jump = new Field(origin.x() + 2 * dx, origin.y() + 2 * dy);
-    if (getAllFields().contains(jump)) {
-      return jump;
+    if (!getAllFields().contains(voisinField)) {
+      throw new FieldException("Field voisin invalide " + voisinField);
+    }
+    // Direction du saut
+    int direcX = voisinField.x() - originField.x();
+    int direcY = voisinField.y() - originField.y();
+    // Coordonnées du voisin étendu
+    int etenduX = originField.x() + 2 * direcX;
+    int etenduY = originField.y() + 2 * direcY;
+    Field saut = new Field(etenduX, etenduY);
+    if (getAllFields().contains(saut)) {
+      return saut;
     } else {
       return null;
     }
