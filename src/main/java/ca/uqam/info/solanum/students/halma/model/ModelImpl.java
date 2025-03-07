@@ -1,17 +1,11 @@
 package ca.uqam.info.solanum.students.halma.model;
 
-import static ca.uqam.info.solanum.students.halma.controller.StarModelFactory.baseSize;
-
 import ca.uqam.info.solanum.inf2050.f24halma.model.Field;
 import ca.uqam.info.solanum.inf2050.f24halma.model.FieldException;
 import ca.uqam.info.solanum.inf2050.f24halma.model.Model;
 import ca.uqam.info.solanum.inf2050.f24halma.model.ModelAccessConsistencyException;
 import ca.uqam.info.solanum.inf2050.f24halma.model.ModelReadOnly;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -24,7 +18,6 @@ public class ModelImpl implements Model, ModelReadOnly {
   private final String[] playerNames;
   private int currentPlayer = 0;
   private final int[][] occupant;
-  private final Map<Field, Integer> occupantMap = new HashMap<>();
   private int baseSize;
 
   /**
@@ -71,7 +64,7 @@ public class ModelImpl implements Model, ModelReadOnly {
       throw new FieldException("Field occupé: " + field);
     }
     // Check si le field est occupé
-    if (!occupantMap.containsKey(field)) {
+    if (occupant[field.y()][field.x()] == -1) {
       throw new ModelAccessConsistencyException("Field non-occupé " + field);
     }
     // Libère le field.
