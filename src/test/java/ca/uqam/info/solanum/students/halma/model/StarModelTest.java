@@ -7,6 +7,7 @@ import ca.uqam.info.solanum.inf2050.f24halma.model.Model;
 import ca.uqam.info.solanum.inf2050.f24halma.model.ModelAccessConsistencyException;
 import ca.uqam.info.solanum.students.halma.controller.StarModelFactory;
 import java.util.Set;
+import junit.framework.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -14,7 +15,7 @@ import static org.junit.Assert.*;
 /**
  * Classe de test pour Model.
  */
-public class StarModelTest extends AbstractModelTest {
+public class  StarModelTest extends AbstractModelTest {
   @Override
   public Model getModel(int baseSize) {
     return new StarModelFactory().createModel(baseSize, new String[] {"Max", "Ryan", "Quentin"});
