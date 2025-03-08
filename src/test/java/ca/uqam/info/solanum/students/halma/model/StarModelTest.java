@@ -111,7 +111,7 @@ public class  StarModelTest extends AbstractModelTest {
     Model model = getModel(1);
     Set<Field> playerFields = model.getPlayerFields(0);
     assertNotNull(playerFields);
-    assertFalse(!playerFields.isEmpty());
+    assertTrue(!playerFields.isEmpty());
   }
 
   /**
