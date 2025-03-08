@@ -18,10 +18,9 @@ import java.util.Set;
 public class ModelImpl implements Model, ModelReadOnly {
   private final BoardImpl board;
   private final String[] playerNames;
-  private int currentPlayer = 0;
+  private int currentPlayer;
   private final int[][] occupant;
-  private int baseSize;
-  private int baseSizeBoard = 0;
+  private int baseSizeBoard;
 
   /**
    * Constructeur de ModelImpl qui prend baseSize et playerNames.
