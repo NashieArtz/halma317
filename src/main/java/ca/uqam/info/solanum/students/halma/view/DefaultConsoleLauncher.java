@@ -22,13 +22,12 @@ public class DefaultConsoleLauncher {
    */
   public static void main(String[] args) {
     runTp01();
-    runTp02();
-    //    runTP01();
+    // runTP01();
   }
 
   private static void runTp01() {
     // Set default parameters.
-    int baseSize = 4;
+    int baseSize = 2;
     String[] playerNames = new String[] {"Max", "Maram", "Roman"};
     // Create a model (read only access) for the provided game parameters.
     ModelFactory modelFactory = new StarModelFactory();
@@ -37,10 +36,6 @@ public class DefaultConsoleLauncher {
     boolean useColours = false;
     TextualVisualizer visualizer = new TextualVisualizer(useColours);
     System.out.println(visualizer.stringifyModel(model));
-  }
-
-  private static void runTp02() {
-    // Will be released with TP02 instructions.
   }
 
   private static void runTp03() {
