@@ -19,6 +19,7 @@ public class ModelImpl implements Model, ModelReadOnly {
   private final BoardImpl board;
   private final String[] playerNames;
   private int currentPlayer;
+  private int baseSize;
   private final int[][] occupant;
   private int baseSizeBoard;
 
