@@ -6,6 +6,8 @@ import ca.uqam.info.solanum.inf2050.f24halma.model.Model;
 import ca.uqam.info.solanum.inf2050.f24halma.model.ModelAccessConsistencyException;
 import ca.uqam.info.solanum.inf2050.f24halma.model.ModelReadOnly;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -16,9 +18,10 @@ import java.util.Set;
 public class ModelImpl implements Model, ModelReadOnly {
   private final BoardImpl board;
   private final String[] playerNames;
-  private int currentPlayer = 0;
-  private final int[][] occupant;
+  private int currentPlayer;
   private int baseSize;
+  private final int[][] occupant;
+  private int baseSizeBoard;
 
   /**
    * Constructeur de ModelImpl qui prend baseSize et playerNames.
@@ -34,6 +37,7 @@ public class ModelImpl implements Model, ModelReadOnly {
     int colonnes = 4 * baseSize + 1;
     int lignes = 6 * baseSize + 1;
     this.occupant = new int[colonnes][lignes];
+    this.baseSizeBoard = baseSize;
     for (int y = 0; y < lignes; y++) {
       for (int x = 0; x < colonnes; x++) {
         occupant[x][y] = -1;
@@ -87,7 +91,32 @@ public class ModelImpl implements Model, ModelReadOnly {
 
   @Override
   public Set<Field> getPlayerFields(int i) {
-    return Set.of();
+    Set<Field> result = new HashSet<>();
+    int colonnes = 4 * baseSizeBoard + 1;
+    int lignes = 6 * baseSizeBoard + 1;
+    switch (i) {
+      case 0:
+        result.add(new Field(0, colonnes - 2));
+        break;
+      case 1:
+        result.add(new Field(i * baseSizeBoard + 2, 0));
+        break;
+      case 2:
+        result.add(new Field(i * baseSizeBoard + 1, colonnes + 1));
+        break;
+      case 3:
+        result.add(new Field(colonnes - 1, lignes - baseSizeBoard - 1));
+        break;
+      case 4:
+        result.add(new Field(baseSizeBoard, lignes / 2));
+        break;
+      case 5:
+        result.add(new Field(colonnes - baseSizeBoard - 1, lignes / 2));
+        break;
+      default:
+        break;
+    }
+    return Collections.unmodifiableSet(result);
   }
 
   @Override

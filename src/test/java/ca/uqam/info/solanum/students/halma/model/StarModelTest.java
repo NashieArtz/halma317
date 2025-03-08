@@ -7,6 +7,7 @@ import ca.uqam.info.solanum.inf2050.f24halma.model.Model;
 import ca.uqam.info.solanum.inf2050.f24halma.model.ModelAccessConsistencyException;
 import ca.uqam.info.solanum.students.halma.controller.StarModelFactory;
 import java.util.Set;
+
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -14,7 +15,7 @@ import static org.junit.Assert.*;
 /**
  * Classe de test pour Model.
  */
-public class StarModelTest extends AbstractModelTest {
+public class  StarModelTest extends AbstractModelTest {
   @Override
   public Model getModel(int baseSize) {
     return new StarModelFactory().createModel(baseSize, new String[] {"Max", "Ryan", "Quentin"});
@@ -27,13 +28,13 @@ public class StarModelTest extends AbstractModelTest {
   public void testInitialisation() {
     Model model = getModel(1);
     assertEquals(3, model.getPlayerNames().length);
-    assertTrue(model.getPlayerFields(0).size() > 0);
+    assertFalse(model.getPlayerFields(0).isEmpty());
   }
 
   /**
    * Vérifie la possibilité d'occuper un field
    *
-   * @throws FieldException
+   * @throws FieldException the field exception
    */
   @Test
   public void testFieldOccupy() throws FieldException {
@@ -46,7 +47,7 @@ public class StarModelTest extends AbstractModelTest {
   /**
    * Vérifie qu'une exception est levée si un joueur tente d'occuper un field invalide.
    *
-   * @throws FieldException
+   * @throws FieldException the field exception
    */
   @Test(expected = FieldException.class)
   public void testInvalidFieldOccupy() throws FieldException {
@@ -58,8 +59,8 @@ public class StarModelTest extends AbstractModelTest {
   /**
    * Vérifie si un field peut être libéré.
    *
-   * @throws FieldException
-   * @throws ModelAccessConsistencyException
+   * @throws FieldException the field exception
+   * @throws ModelAccessConsistencyException the modelaccess exception
    */
   @Test
   public void testClearField() throws FieldException, ModelAccessConsistencyException {
@@ -73,8 +74,8 @@ public class StarModelTest extends AbstractModelTest {
   /**
    * Vérifie qu'une exception est levée si on tente de libérer un field déjà libre.
    *
-   * @throws FieldException
-   * @throws ModelAccessConsistencyException
+   * @throws FieldException                  the field exception
+   * @throws ModelAccessConsistencyException the model access consistency exception
    */
   @Test(expected = ModelAccessConsistencyException.class)
   public void testClearUnoccupiedField() throws FieldException, ModelAccessConsistencyException {
@@ -110,14 +111,14 @@ public class StarModelTest extends AbstractModelTest {
     Model model = getModel(1);
     Set<Field> playerFields = model.getPlayerFields(0);
     assertNotNull(playerFields);
-    assertTrue(playerFields.size() > 0);
+    assertTrue(!playerFields.isEmpty());
   }
 
   /**
    * Vérifie qu'un field est initialement libre, puis qu'il est occupé après avoir été assigné
    * à un joueur.
    *
-   * @throws FieldException
+   * @throws FieldException the field exception
    */
   @Test
   public void testIsClear() throws FieldException {
@@ -131,7 +132,7 @@ public class StarModelTest extends AbstractModelTest {
   /**
    * Vérifie qu'une exception est levée si on tente de vérifier l'état d'un field invalide.
    *
-   * @throws FieldException
+   * @throws FieldException the field exception
    */
   @Test(expected = FieldException.class)
   public void testIsClearInvalidField() throws FieldException {

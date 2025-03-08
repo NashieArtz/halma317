@@ -131,38 +131,23 @@ public class BoardImpl implements Board {
 
   @Override
   public Set<Field> getNeighbours(Field field) {
-    // Validation du field
     if (!getAllFields().contains(field)) {
-      throw new FieldException("Field pas sur le jeu " + field.toString());
+      throw new RuntimeException(
+          new FieldException("Field pas dans le plateau: " + field.toString()));
     }
     // Coordonnées du field
     int x = field.x();
     int y = field.y();
     // Directions possibles
     int[][] directions = {
-        // Gauche
-        {-1, 0},
-        // Droite
-        {1, 0},
-        // Haut
-        {0, -1},
-        // Bas
-        {0, 1},
-        // Haut-Gauche
-        {-1, -1},
-        // Haut-Droite
-        {1, -1},
-        // Bas-Droite
-        {1, 1},
-        // Bas-Gauche
-        {-1, 1}
+        {-1, 0}, {1, 0}, {0, -1}, {0, 1},
+        {-1, -1}, {1, 1}, {-1, 1}, {1, -1},
+        {0, -2}, {0, 2}
     };
     Set<Field> voisin = new HashSet<>();
     for (int[] d : directions) {
-      // Calculer les coordoonées du voisin
-      int newX = x + d[0];
-      int newY = y + d[1];
-      Field voisinValide = new Field(newX, newY);
+      // Calculer les coordonées du voisin
+      Field voisinValide = new Field(x + d[0], y + d[1]);
       if (getAllFields().contains(voisinValide)) {
         voisin.add(voisinValide);
       }
@@ -172,20 +157,19 @@ public class BoardImpl implements Board {
 
   @Override
   public Field getExtendedNeighbour(Field originField, Field voisinField) {
-    // Check validité originField et voisinField
-    if (!getAllFields().contains(originField)) {
-      throw new FieldException("Field originel invalide " + originField);
-    }
-    if (!getAllFields().contains(voisinField)) {
-      throw new FieldException("Field voisin invalide " + voisinField);
+    if (!getAllFields().contains(originField)
+        || !getAllFields().contains(voisinField)) {
+      throw new RuntimeException(
+          new FieldException("Invalid origin or via field: " + originField + " / " + voisinField));
     }
     // Direction du saut
-    int direcX = voisinField.x() - originField.x();
-    int direcY = voisinField.y() - originField.y();
+    int directX = voisinField.x() - originField.x();
+    int directY = voisinField.y() - originField.y();
+    if (directX > 1 || directY > 1) {
+      throw new FieldException("Via field is not a direct neighbor of origin: " + voisinField);
+    }
     // Coordonnées du voisin étendu
-    int etenduX = originField.x() + 2 * direcX;
-    int etenduY = originField.y() + 2 * direcY;
-    Field saut = new Field(etenduX, etenduY);
+    Field saut = new Field(originField.x() + 2 * directX, originField.y() + 2 * directY);
     if (getAllFields().contains(saut)) {
       return saut;
     } else {
