@@ -54,7 +54,7 @@
         <dependency>
             <groupId>ca.uqam.info.solanum</groupId>
             <artifactId>halmatests</artifactId>
-            <version>f25-1.5-tp3-regressed</version>
+            <version>f25-1.6-tp3-regressed</version>
             <scope>test</scope>
         </dependency>
 
