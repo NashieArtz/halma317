@@ -33,22 +33,68 @@ public class BoardImpl implements Board {
     int lignes = 6 * baseSize + 1;
     for (int y = 0; y < lignes; y++) {
       for (int x = 0; x < colonnes; x++) {
-        if ((baseSize % 2) == ((x + y) % 2)) {
-          boolean pointeHaut =
-              (x >= baseSize)
-                  && (y >= x - baseSize - 1)
-                  && (y <= (lignes - 1) - x + baseSize);
-          boolean pointeBas =
-              (x <= (colonnes - 1 - baseSize))
-                  && (y >= ((colonnes - 1) - baseSize) - x - 1)
-                  && (y <= (lignes - 1) - ((colonnes - 1 - x) - baseSize));
-          if (pointeHaut || pointeBas) {
-            emptyFields.add(new Field(x, y));
-          }
+        if (isValidField(x, y, colonnes, lignes)) {
+          emptyFields.add(new Field(x, y));
         }
       }
     }
     return Collections.unmodifiableSet(emptyFields);
+  }
+
+
+  /**
+   * Vérifie la position d'un champ sur le plateau.
+   *
+   * @param x        Coordonnée x
+   * @param y        Coordonnée y
+   * @param colonnes Nombre total de colonnes
+   * @param lignes   Nombre total de lignes
+   * @return true si le champ a une condition valide et est dans une zone du plateau
+   */
+  private boolean isValidField(int x, int y, int colonnes, int lignes) {
+    return hasValidCondition(x, y)
+        && (isUpperTriangle(x, y, lignes)
+        || isLowerTriangle(x, y, colonnes, lignes));
+  }
+
+  /**
+   * Vérifie la partié selon la taille de la base.
+   *
+   * @param x Coordonnée x
+   * @param y Coordonnée y
+   * @return true si (x+y) a la même valeur que baseSize
+   */
+  private boolean hasValidCondition(int x, int y) {
+    return (baseSize % 2) == ((x + y) % 2);
+  }
+
+  /**
+   * Vérifie si un champ fait partie du triangle supérieur.
+   *
+   * @param x      Coordonnée x
+   * @param y      Coordonnée y
+   * @param lignes   Nombre total de lignes
+   * @return true si le champ est dans le triangle supérieur
+   */
+  private boolean isUpperTriangle(int x, int y, int lignes) {
+    return x >= baseSize
+        && (y >= x - baseSize - 1)
+        && (y <= ((lignes - 1) - x + baseSize));
+  }
+
+  /**
+   * Vérifie si un champ fait partie du triangle inférieur.
+   *
+   * @param x        Coordonnée x
+   * @param y        Coordonnée y
+   * @param colonnes Nombre total de colonnes
+   * @param lignes   Nombre total de lignes
+   * @return true si le champ est dans le triangle inférieur
+   */
+  private boolean isLowerTriangle(int x, int y, int colonnes, int lignes) {
+    return x <= (colonnes - baseSize - 1)
+        && y >= (((colonnes - 1) - baseSize) - x - 1)
+        && y <= ((lignes - 1) - ((colonnes - x - 1) - baseSize));
   }
 
   @Override
@@ -58,61 +104,68 @@ public class BoardImpl implements Board {
     int lignes = 6 * baseSize + 1;
     switch (playerIndex) {
       case 0:
-        // Pointe haut-gauche
-        homeField.add(new Field(baseSize, 0));
-        if (baseSize >= 2) {
-          homeField.add(new Field(baseSize - 1, 1));
-          homeField.add(new Field(baseSize, 2));
-          homeField.add(new Field(baseSize + 1, 1));
-        }
+        configurePointedArea(homeField, baseSize, 0, colonnes, lignes, true);
         break;
       case 1:
-        // Pointe haut-droite
-        homeField.add(new Field(colonnes - baseSize - 1, 0));
-        if (baseSize >= 2) {
-          homeField.add(new Field(colonnes - baseSize - 2, 1));
-          homeField.add(new Field(colonnes - baseSize - 1, 2));
-          homeField.add(new Field(colonnes - baseSize, 1));
-        }
+        configurePointedArea(homeField, colonnes - baseSize - 1, 0, colonnes, lignes, true);
         break;
       case 2:
-        // Pointe gauche
-        homeField.add(new Field(0, lignes / 2));
-        if (baseSize >= 2) {
-          homeField.add(new Field(1, lignes / 2 + 1));
-          homeField.add(new Field(1, lignes / 2 - baseSize + 1));
-        }
+        configureSideArea(homeField, 0, lignes / 2, colonnes, lignes);
         break;
       case 3:
-        // Pointe bas-gauche
-        homeField.add(new Field(baseSize, lignes - 1));
-        if (baseSize >= 2) {
-          homeField.add(new Field(baseSize - 1, lignes - 2));
-          homeField.add(new Field(baseSize, lignes - 3));
-          homeField.add(new Field(baseSize + 1, lignes - 2));
-        }
+        configurePointedArea(homeField, baseSize, lignes - 1, colonnes, lignes, false);
         break;
       case 4:
-        // Pointe bas-droite
-        homeField.add(new Field(colonnes - baseSize - 1, lignes - 1));
-        if (baseSize >= 2) {
-          homeField.add(new Field(colonnes - baseSize - 2, lignes - 2));
-          homeField.add(new Field(colonnes - baseSize - 1, lignes - 3));
-          homeField.add(new Field(colonnes - baseSize, lignes - 2));
-        }
+        configurePointedArea(homeField, colonnes - baseSize - 1, lignes - 1, colonnes, lignes,
+            false);
         break;
       case 5:
-        // Pointe droite
-        homeField.add(new Field(colonnes - 1, lignes / 2));
-        if (baseSize >= 2) {
-          homeField.add(new Field(colonnes - 2, lignes / 2 + 1));
-          homeField.add(new Field(colonnes - 2, lignes / 2 - baseSize + 1));
-        }
+        configureSideArea(homeField, colonnes - 1, lignes / 2, colonnes, lignes);
         break;
       default:
         break;
     }
     return Collections.unmodifiableSet(homeField);
+  }
+
+  /**
+   * test.
+   *
+   * @param set      test.
+   * @param x        test.
+   * @param y        test.
+   * @param colonnes test.
+   * @param lignes   test.
+   * @param isTop    test.
+   */
+  private void configurePointedArea(Set<Field> set, int x, int y, int colonnes, int lignes,
+                                    boolean isTop) {
+    set.add(new Field(x, y));
+    if (baseSize < 2) {
+      return;
+    }
+    int modifierY = isTop ? 1 : -1;
+    set.add(new Field(x - 1, y + modifierY));
+    set.add(new Field(x, y + 2 * modifierY));
+    set.add(new Field(x + 1, y + modifierY));
+  }
+
+  /**
+   * test.
+   *
+   * @param set      test.
+   * @param x        test.
+   * @param y        test.
+   * @param colonnes test.
+   * @param lignes   test.
+   */
+  private void configureSideArea(Set<Field> set, int x, int y, int colonnes, int lignes) {
+    set.add(new Field(x, y));
+    if (baseSize < 2) {
+      return;
+    }
+    set.add(new Field(x + (x == 0 ? 1 : -1), y + 1));
+    set.add(new Field(x + (x == 0 ? 1 : -1), y - baseSize + 1));
   }
 
   @Override
