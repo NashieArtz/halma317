@@ -41,7 +41,6 @@ public class BoardImpl implements Board {
     return Collections.unmodifiableSet(emptyFields);
   }
 
-
   /**
    * Vérifie la position d'un champ sur le plateau.
    *
@@ -73,7 +72,7 @@ public class BoardImpl implements Board {
    *
    * @param x      Coordonnée x
    * @param y      Coordonnée y
-   * @param lignes   Nombre total de lignes
+   * @param lignes Nombre total de lignes
    * @return true si le champ est dans le triangle supérieur
    */
   private boolean isUpperTriangle(int x, int y, int lignes) {
@@ -104,23 +103,23 @@ public class BoardImpl implements Board {
     int lignes = 6 * baseSize + 1;
     switch (playerIndex) {
       case 0:
-        configurePointedArea(homeField, baseSize, 0, colonnes, lignes, true);
+        configurePointedArea(homeField, baseSize, 0, true);
         break;
       case 1:
-        configurePointedArea(homeField, colonnes - baseSize - 1, 0, colonnes, lignes, true);
+        configurePointedArea(homeField, colonnes - baseSize - 1, 0, true);
         break;
       case 2:
-        configureSideArea(homeField, 0, lignes / 2, colonnes, lignes);
+        configureSideArea(homeField, 0, lignes / 2);
         break;
       case 3:
-        configurePointedArea(homeField, baseSize, lignes - 1, colonnes, lignes, false);
+        configurePointedArea(homeField, baseSize, lignes - 1, false);
         break;
       case 4:
-        configurePointedArea(homeField, colonnes - baseSize - 1, lignes - 1, colonnes, lignes,
+        configurePointedArea(homeField, colonnes - baseSize - 1, lignes - 1,
             false);
         break;
       case 5:
-        configureSideArea(homeField, colonnes - 1, lignes / 2, colonnes, lignes);
+        configureSideArea(homeField, colonnes - 1, lignes / 2);
         break;
       default:
         break;
@@ -129,17 +128,14 @@ public class BoardImpl implements Board {
   }
 
   /**
-   * test.
+   * Configure une zone home ou target pour chaque joueur.
    *
-   * @param set      test.
-   * @param x        test.
-   * @param y        test.
-   * @param colonnes test.
-   * @param lignes   test.
-   * @param isTop    test.
+   * @param set   Le set où les fields seront ajoutés
+   * @param x     Coordonnée X
+   * @param y     Coordonnée Y
+   * @param isTop Vérifier l'emplacement de la pointe
    */
-  private void configurePointedArea(Set<Field> set, int x, int y, int colonnes, int lignes,
-                                    boolean isTop) {
+  private void configurePointedArea(Set<Field> set, int x, int y, boolean isTop) {
     set.add(new Field(x, y));
     if (baseSize < 2) {
       return;
@@ -151,15 +147,13 @@ public class BoardImpl implements Board {
   }
 
   /**
-   * test.
+   * Configure une zone home ou target pour chaque joueur.
    *
-   * @param set      test.
-   * @param x        test.
-   * @param y        test.
-   * @param colonnes test.
-   * @param lignes   test.
+   * @param set Le set où les fields seront ajoutés
+   * @param x   Coordonnée X
+   * @param y   Coordonnée Y
    */
-  private void configureSideArea(Set<Field> set, int x, int y, int colonnes, int lignes) {
+  private void configureSideArea(Set<Field> set, int x, int y) {
     set.add(new Field(x, y));
     if (baseSize < 2) {
       return;
@@ -178,8 +172,34 @@ public class BoardImpl implements Board {
   }
 
   @Override
-  public Set<Field> getTargetFieldsForPlayer(int i) {
-    return Set.of();
+  public Set<Field> getTargetFieldsForPlayer(int playerIndex) {
+    Set<Field> targetFields = new HashSet<>();
+    int colonnes = 4 * baseSize + 1;
+    int lignes = 6 * baseSize + 1;
+    switch (playerIndex) {
+      case 0:
+        configurePointedArea(targetFields, baseSize, lignes - 1, false);
+        break;
+      case 1:
+        configurePointedArea(targetFields, colonnes - baseSize - 1, lignes - 1,
+            false);
+        break;
+      case 2:
+        configureSideArea(targetFields, colonnes - 1, lignes / 2);
+        break;
+      case 3:
+        configurePointedArea(targetFields, baseSize, 0, true);
+        break;
+      case 4:
+        configurePointedArea(targetFields, colonnes - baseSize - 1, 0, true);
+        break;
+      case 5:
+        configureSideArea(targetFields, 0, lignes / 2);
+        break;
+      default:
+        break;
+    }
+    return Collections.unmodifiableSet(targetFields);
   }
 
   @Override

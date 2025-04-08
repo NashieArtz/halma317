@@ -48,11 +48,20 @@ public class ControllerImpl implements Controller {
     int currentPlayerIndex = model.getCurrentPlayer();
     Set<Field> playerFields = model.getPlayerFields(currentPlayerIndex);
     List<Move> possibleMoves = new ArrayList<>();
+    // Check pour un mouvement simple ou un saut
     for (Field field : playerFields) {
       Set<Field> neighbours = model.getBoard().getNeighbours(field);
+      // Vérifier chaque case voisine
       for (Field neighbour : neighbours) {
+        // Champ vide = mouvement simple
         if (model.isClear(neighbour)) {
           possibleMoves.add(new Move(field, neighbour, false));
+        } else {
+          // Champ occupée
+          Field jumpTarget = model.getBoard().getExtendedNeighbour(field, neighbour);
+          if (jumpTarget != null && model.isClear(jumpTarget)) {
+            possibleMoves.add(new Move(field, jumpTarget, true));
+          }
         }
       }
     }
