@@ -76,9 +76,9 @@ public class BoardImpl implements Board {
    * @return true si le champ est dans le triangle supérieur
    */
   private boolean isUpperTriangle(int x, int y, int lignes) {
-    return x >= baseSize
+    return (x >= baseSize)
         && (y >= x - baseSize - 1)
-        && (y <= ((lignes - 1) - x + baseSize));
+        && (y <= (lignes - 1) - x + baseSize);
   }
 
   /**
@@ -91,9 +91,9 @@ public class BoardImpl implements Board {
    * @return true si le champ est dans le triangle inférieur
    */
   private boolean isLowerTriangle(int x, int y, int colonnes, int lignes) {
-    return x <= (colonnes - baseSize - 1)
-        && y >= (((colonnes - 1) - baseSize) - x - 1)
-        && y <= ((lignes - 1) - ((colonnes - x - 1) - baseSize));
+    return (x <= (colonnes - 1 - baseSize))
+        && (y >= ((colonnes - 1) - baseSize) - x - 1)
+        && (y <= (lignes - 1) - ((colonnes - 1 - x) - baseSize));
   }
 
   @Override
