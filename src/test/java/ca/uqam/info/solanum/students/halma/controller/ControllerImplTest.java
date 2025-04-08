@@ -12,13 +12,13 @@ public class ControllerImplTest {
 
   @Test(expected = IllegalStateException.class)
   public void testInvalidMoveExecution() {
-    ControllerImpl ctrl = new ControllerImpl(new StarModelFactory(), 1, new String[] {"A"});
+    ControllerImpl ctrl = new ControllerImpl(new StarModelFactory(), 1, new String[] {"A", "B"});
     ctrl.performMove(new Move(new Field(0, 0), new Field(10, 10), false));
   }
 
   @Test
   public void testEarlyGameOverDetection() {
-    ControllerImpl ctrl = new ControllerImpl(new StarModelFactory(), 1, new String[] {"A"});
+    ControllerImpl ctrl = new ControllerImpl(new StarModelFactory(), 1, new String[] {"A", "B"});
     assertFalse(ctrl.isGameOver());
   }
 }
