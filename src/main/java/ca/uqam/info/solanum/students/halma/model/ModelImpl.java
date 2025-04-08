@@ -131,12 +131,18 @@ public class ModelImpl implements Model, ModelReadOnly {
 
   @Override
   public boolean isClear(Field field) throws FieldException {
-    // Vérifier si le field est sur le plateau
+    //Variable local
+    boolean clear = false;
+    //Valider si le field existe dans le board
     if (!board.getAllFields().contains(field)) {
-      throw new FieldException("Field invalide: " + field);
+      throw new FieldException("Field occupé: " + field);
     }
-    // Vérifier si le field est libre (occupant == -1)
-    return occupant[field.y()][field.x()] == -1;
+    //Si le field est égale a -1 alors renvoyer vrai
+    //sinon on renvoi faux
+    if (occupant[field.y()][field.x()] == -1) {
+      clear = true;
+    }
+    return clear;
   }
 
   @Override
