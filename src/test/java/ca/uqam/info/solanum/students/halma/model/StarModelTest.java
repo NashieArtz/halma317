@@ -7,7 +7,6 @@ import ca.uqam.info.solanum.inf2050.f24halma.model.Model;
 import ca.uqam.info.solanum.inf2050.f24halma.model.ModelAccessConsistencyException;
 import ca.uqam.info.solanum.students.halma.controller.StarModelFactory;
 import java.util.Set;
-
 import org.junit.Test;
 
 import static org.junit.Assert.*;
@@ -15,7 +14,7 @@ import static org.junit.Assert.*;
 /**
  * Classe de test pour Model.
  */
-public class  StarModelTest extends AbstractModelTest {
+public class StarModelTest extends AbstractModelTest {
   @Override
   public Model getModel(int baseSize) {
     return new StarModelFactory().createModel(baseSize, new String[] {"Max", "Ryan", "Quentin"});
@@ -59,7 +58,7 @@ public class  StarModelTest extends AbstractModelTest {
   /**
    * Vérifie si un field peut être libéré.
    *
-   * @throws FieldException the field exception
+   * @throws FieldException                  the field exception
    * @throws ModelAccessConsistencyException the modelaccess exception
    */
   @Test
@@ -139,5 +138,12 @@ public class  StarModelTest extends AbstractModelTest {
     Model model = getModel(1);
     Field field = new Field(10, 10);
     model.isClear(field);
+  }
+
+  @Test(expected = ModelAccessConsistencyException.class)
+  public void testSetCurrentPlayerDuringMove() throws ModelAccessConsistencyException {
+    Model model = getModel(1);
+    model.setCurrentPlayer(0);
+    model.setCurrentPlayer(1);
   }
 }

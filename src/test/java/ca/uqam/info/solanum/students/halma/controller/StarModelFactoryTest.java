@@ -38,7 +38,7 @@ public class StarModelFactoryTest extends AbstractStarModelFactoryTest {
   }
 
   /**
-   * érifie que la forme du plateau est correcte.
+   * Vérifie que la forme du plateau est correcte.
    */
   @Test
   public void testBoardShape() {
@@ -47,5 +47,11 @@ public class StarModelFactoryTest extends AbstractStarModelFactoryTest {
     assertNotNull(model.getBoard());
     assertEquals(7, model.getBoard().getAllFields().size());
   }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void testInvalidBaseSize() {
+    new ControllerImpl(new StarModelFactory(), 0, new String[]{"A"});
+  }
+
 }
 
