@@ -9,6 +9,7 @@ import ca.uqam.info.solanum.inf2050.f24halma.view.MoveSelector;
 import ca.uqam.info.solanum.inf2050.f24halma.view.TextualVisualizer;
 import ca.uqam.info.solanum.students.halma.controller.ControllerImpl;
 import ca.uqam.info.solanum.students.halma.controller.StarModelFactory;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -29,6 +30,7 @@ public class DefaultConsoleLauncher {
   public static void main(String[] args) {
     runTp01();
     runTp03(args);
+    runTp04(args);
   }
 
   private static void runTp01() {
@@ -62,6 +64,59 @@ public class DefaultConsoleLauncher {
     // Proceed until game end
     while (!controller.isGameOver()) { // Voila la boucle prinicipale... continuer le jeu jusqu'à
       // une personne a gagné
+      printAndRequestAndPerformAction(controller, visualizer, moveSelectors);
+    }
+    System.out.println(visualizer.stringifyModel(controller.getModel()));
+    System.out.println("GAME OVER!");
+  }
+
+  private static void runTp04(String[] args) {
+    // Parse runtime parameters
+    int baseSize = Integer.parseInt(args[0]);
+    String[] playerNames = Arrays.copyOfRange(args, 1, args.length);
+
+    // Vérifier que le nombre de joueurs est valide
+    int expectedPlayers = (baseSize == 1) ? 3
+        : (baseSize == 2) ? 6
+        : -1;
+    if (expectedPlayers == -1
+        || playerNames.length != expectedPlayers) {
+      System.err.printf(
+          "Erreur : pour baseSize=%d, il faut %d joueurs (vous en avez fourni %d).%n",
+          baseSize, expectedPlayers, playerNames.length);
+      System.err.println("Usage : java -jar halma.jar <baseSize> <J1> <J2> <J3> [<J4>..<J6>]");
+      System.exit(1);
+    }
+
+
+    ModelFactory modelFactory = new StarModelFactory();
+
+    String iaProfile = System.getProperty("halma.ia", "MadMax");
+    // Set move selectors
+    MoveSelector[] moveSelectors = new MoveSelector[playerNames.length];
+    for (int i = 0; i < playerNames.length; i++) {
+      if ("AI".equalsIgnoreCase(playerNames[i])) {
+        switch (iaProfile) {
+          case "Keksli":
+            moveSelectors[i] = new KeksliMoveSelector();
+            break;
+          default:
+            moveSelectors[i] = new MadMaxMoveSelector();
+        }
+      } else {
+        moveSelectors[i] = new InteractiveMoveSelector();
+      }
+    }
+
+    // Initialize controller
+    Controller controller = new ControllerImpl(modelFactory, baseSize, playerNames);
+
+    // Initialize visualizer
+    boolean useColours = true;
+    TextualVisualizer visualizer = new TextualVisualizer(useColours);
+
+    // Proceed until game end
+    while (!controller.isGameOver()) {
       printAndRequestAndPerformAction(controller, visualizer, moveSelectors);
     }
     System.out.println(visualizer.stringifyModel(controller.getModel()));

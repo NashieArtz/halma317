@@ -13,6 +13,30 @@
         <maven.compiler.release>21</maven.compiler.release>
     </properties>
 
+    <!-- Définition des profils Maven -->
+    <profiles>
+        <!-- Profil par défaut : IA MadMax -->
+        <profile>
+            <id>madmax</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <!-- propriété lue par votre code pour choisir l’IA -->
+                <halma.ia>MadMax</halma.ia>
+            </properties>
+        </profile>
+
+        <!-- Profil pour IA Keksli -->
+        <profile>
+            <id>keksli</id>
+            <properties>
+                <halma.ia>Keksli</halma.ia>
+            </properties>
+        </profile>
+    </profiles>
+
+
     <!-- Add third party repo-->
     <!--    https://gitlab.info.uqam.ca/max/inf2050repo/-/tree/main/public/ca/uqam?ref_type=heads -->
     <repositories>
@@ -47,14 +71,14 @@
         <dependency>
             <groupId>ca.uqam.info.solanum</groupId>
             <artifactId>halmainterfaces</artifactId>
-            <version>f25-1.5</version>
+            <version>f25-1.6</version>
         </dependency>
 
         <!-- Provided abstract tests, as TEST scoped dependency -->
         <dependency>
             <groupId>ca.uqam.info.solanum</groupId>
             <artifactId>halmatests</artifactId>
-            <version>f25-1.6-tp3-regressed</version>
+            <version>f25-1.6-tp4-regressed</version>
             <scope>test</scope>
         </dependency>
 
@@ -73,6 +97,33 @@
 
 
     </dependencies>
+
+    <pluginRepositories>
+        <!-- Votre dépôt interne, si vous y avez mis PIT -->
+        <pluginRepository>
+            <id>inf2050repo-plugins</id>
+            <url>https://max.pages.info.uqam.ca/inf2050repo/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+
+        <!-- Maven Central pour récupérer PIT -->
+        <pluginRepository>
+            <id>central</id>
+            <name>Maven Central</name>
+            <url>https://repo.maven.apache.org/maven2</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
 
     <build>
         <!-- Override default name of generated jars -->
@@ -203,6 +254,24 @@
                     <finalName>Halma</finalName>
                     <appendAssemblyId>false</appendAssemblyId>
                 </configuration>
+            </plugin>
+
+            <!-- Mutation test report-->
+            <!-- HTML report available at:  target/pit-reports/index.html  -->
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>1.17.1</version>
+                <executions>
+                    <execution>
+                        <id>pit-report</id>
+                        <!-- optional, this example attached the goal into mvn test phase -->
+                        <phase>test</phase>
+                        <goals>
+                            <goal>mutationCoverage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
 
 	    <!-- COPY RENAME PLUGIN ICI -->
