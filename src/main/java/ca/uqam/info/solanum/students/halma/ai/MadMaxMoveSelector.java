@@ -13,6 +13,14 @@ public class MadMaxMoveSelector implements MoveSelector {
   private final Random rng = new Random(42);
 
   /**
+   * test.
+   *
+   * @param seed test
+   */
+  public MadMaxMoveSelector(int seed) {
+  }
+
+  /**
    * Sélectionne un mouvement aléatoire parmi une liste de mouvements possibles.
    *
    * @param allPossibleMoves la liste des mouvements possibles

@@ -36,4 +36,6 @@ public class BoardImplTest {
   public void testExtendedNeighbourInvalid() throws Exception {
     new BoardImpl(1).getExtendedNeighbour(new Field(0,0), new Field(2,2));
   }
+
+
 }
