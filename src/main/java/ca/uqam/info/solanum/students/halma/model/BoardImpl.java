@@ -28,122 +28,69 @@ public class BoardImpl implements Board {
 
   @Override
   public Set<Field> getAllFields() {
-    Set<Field> emptyFields = new HashSet<>();
-    int colonnes = 4 * baseSize + 1;
-    int lignes = 6 * baseSize + 1;
-    for (int y = 0; y < lignes; y++) {
-      for (int x = 0; x < colonnes; x++) {
-        if (isValidField(x, y, colonnes, lignes)) {
-          emptyFields.add(new Field(x, y));
+    Set<Field> all = new HashSet<>();
+    int cols = 4 * baseSize + 1;
+    int rows = 6 * baseSize + 1;
+    for (int x = 0; x < cols; x++) {
+      for (int y = 0; y < rows; y++) {
+        if ((x + y) % 2 == baseSize % 2 && inStar(x, y, cols, rows)) {
+          all.add(new Field(x, y));
         }
       }
     }
-    return Collections.unmodifiableSet(emptyFields);
+    return Collections.unmodifiableSet(all);
   }
 
   /**
-   * Vérifie la position d'un champ sur le plateau.
+   * test.
    *
-   * @param x        Coordonnée x
-   * @param y        Coordonnée y
-   * @param colonnes Nombre total de colonnes
-   * @param lignes   Nombre total de lignes
-   * @return true si le champ a une condition valide et est dans une zone du plateau
+   * @param x test
+   * @param y test
+   * @param c test
+   * @param r test
+   * @return test
    */
-  private boolean isValidField(int x, int y, int colonnes, int lignes) {
-    return hasValidCondition(x, y)
-        && (isUpperTriangle(x, y, lignes)
-        || isLowerTriangle(x, y, colonnes, lignes));
-  }
-
-  /**
-   * Vérifie la partié selon la taille de la base.
-   *
-   * @param x Coordonnée x
-   * @param y Coordonnée y
-   * @return true si (x+y) a la même valeur que baseSize
-   */
-  private boolean hasValidCondition(int x, int y) {
-    return (baseSize % 2) == ((x + y) % 2);
-  }
-
-  /**
-   * Vérifie si un champ fait partie du triangle supérieur.
-   *
-   * @param x      Coordonnée x
-   * @param y      Coordonnée y
-   * @param lignes Nombre total de lignes
-   * @return true si le champ est dans le triangle supérieur
-   */
-  private boolean isUpperTriangle(int x, int y, int lignes) {
-    return (x >= baseSize)
-        && (y >= x - baseSize - 1)
-        && (y <= (lignes - 1) - x + baseSize);
-  }
-
-  /**
-   * Vérifie si un champ fait partie du triangle inférieur.
-   *
-   * @param x        Coordonnée x
-   * @param y        Coordonnée y
-   * @param colonnes Nombre total de colonnes
-   * @param lignes   Nombre total de lignes
-   * @return true si le champ est dans le triangle inférieur
-   */
-  private boolean isLowerTriangle(int x, int y, int colonnes, int lignes) {
-    return (x <= (colonnes - 1 - baseSize))
-        && (y >= ((colonnes - 1) - baseSize) - x - 1)
-        && (y <= (lignes - 1) - ((colonnes - 1 - x) - baseSize));
+  private boolean inStar(int x, int y, int c, int r) {
+    return (x >= baseSize && y >= x - baseSize - 1 && y <= r - 1 - x + baseSize)
+        || (x <= c - 1 - baseSize && y >= c - 1 - baseSize - x - 1
+        && y <= r - 1 - (c - 1 - baseSize - x));
   }
 
   @Override
   public Set<Field> getHomeFieldsForPlayer(int playerIndex) {
-    Set<Field> homeField = new HashSet<>();
-    int colonnes = 4 * baseSize + 1;
-    int lignes = 6 * baseSize + 1;
+    Set<Field> home = new HashSet<>();
+    int cols = 4 * baseSize + 1;
+    int rows = 6 * baseSize + 1;
     switch (playerIndex) {
-      case 0:
-        configurePointedArea(homeField, baseSize, 0, true);
-        break;
-      case 1:
-        configurePointedArea(homeField, colonnes - baseSize - 1, 0, true);
-        break;
-      case 2:
-        configureSideArea(homeField, 0, lignes / 2);
-        break;
-      case 3:
-        configurePointedArea(homeField, baseSize, lignes - 1, false);
-        break;
-      case 4:
-        configurePointedArea(homeField, colonnes - baseSize - 1, lignes - 1,
-            false);
-        break;
-      case 5:
-        configureSideArea(homeField, colonnes - 1, lignes / 2);
-        break;
-      default:
-        break;
+      case 0 -> configurePointedArea(home, baseSize, 0, true);
+      case 1 -> configurePointedArea(home, cols - baseSize - 1, 0, true);
+      case 2 -> configureSideArea(home, cols - 1, rows / 2);
+      case 3 -> configurePointedArea(home, baseSize, rows - 1, false);
+      case 4 -> configurePointedArea(home, cols - baseSize - 1, rows - 1, false);
+      case 5 -> configureSideArea(home, 0, rows / 2);
+      default -> {
+      }
     }
-    return Collections.unmodifiableSet(homeField);
+    return Collections.unmodifiableSet(home);
   }
 
   /**
    * Configure une zone home ou target pour chaque joueur.
    *
-   * @param set   Le set où les fields seront ajoutés
-   * @param x     Coordonnée X
-   * @param y     Coordonnée Y
-   * @param isTop Vérifier l'emplacement de la pointe
+   * @param set Le set où les fields seront ajoutés
+   * @param x   Coordonnée X
+   * @param y   Coordonnée Y
+   * @param top Vérifier l'emplacement de la pointe
    */
-  private void configurePointedArea(Set<Field> set, int x, int y, boolean isTop) {
+  private void configurePointedArea(Set<Field> set, int x, int y, boolean top) {
     set.add(new Field(x, y));
     if (baseSize < 2) {
       return;
     }
-    int modifierY = isTop ? 1 : -1;
-    set.add(new Field(x - 1, y + modifierY));
-    set.add(new Field(x, y + 2 * modifierY));
-    set.add(new Field(x + 1, y + modifierY));
+    int dy = top ? 1 : -1;
+    set.add(new Field(x - 1, y + dy));
+    set.add(new Field(x, y + 2 * dy));
+    set.add(new Field(x + 1, y + dy));
   }
 
   /**
@@ -158,8 +105,9 @@ public class BoardImpl implements Board {
     if (baseSize < 2) {
       return;
     }
-    set.add(new Field(x + (x == 0 ? 1 : -1), y + 1));
-    set.add(new Field(x + (x == 0 ? 1 : -1), y - baseSize + 1));
+    int dx = (x == 0) ? 1 : -1;
+    set.add(new Field(x + dx, y + 1));
+    set.add(new Field(x + dx, y - baseSize + 1));
   }
 
   @Override
@@ -173,80 +121,52 @@ public class BoardImpl implements Board {
 
   @Override
   public Set<Field> getTargetFieldsForPlayer(int playerIndex) {
-    Set<Field> targetFields = new HashSet<>();
-    int colonnes = 4 * baseSize + 1;
-    int lignes = 6 * baseSize + 1;
+    Set<Field> target = new HashSet<>();
+    int cols = 4 * baseSize + 1;
+    int rows = 6 * baseSize + 1;
     switch (playerIndex) {
-      case 0:
-        configurePointedArea(targetFields, baseSize, lignes - 1, false);
-        break;
-      case 1:
-        configurePointedArea(targetFields, colonnes - baseSize - 1, lignes - 1,
-            false);
-        break;
-      case 2:
-        configureSideArea(targetFields, colonnes - 1, lignes / 2);
-        break;
-      case 3:
-        configurePointedArea(targetFields, baseSize, 0, true);
-        break;
-      case 4:
-        configurePointedArea(targetFields, colonnes - baseSize - 1, 0, true);
-        break;
-      case 5:
-        configureSideArea(targetFields, 0, lignes / 2);
-        break;
-      default:
-        break;
-    }
-    return Collections.unmodifiableSet(targetFields);
-  }
-
-  @Override
-  public Set<Field> getNeighbours(Field field) {
-    if (!getAllFields().contains(field)) {
-      throw new RuntimeException(
-          new FieldException("Field pas dans le plateau: " + field.toString()));
-    }
-    // Coordonnées du field
-    int x = field.x();
-    int y = field.y();
-    // Directions possibles
-    int[][] directions = {
-        {-1, 0}, {1, 0}, {0, -1}, {0, 1},
-        {-1, -1}, {1, 1}, {-1, 1}, {1, -1},
-        {0, -2}, {0, 2}
-    };
-    Set<Field> voisin = new HashSet<>();
-    for (int[] d : directions) {
-      // Calculer les coordonées du voisin
-      Field voisinValide = new Field(x + d[0], y + d[1]);
-      if (getAllFields().contains(voisinValide)) {
-        voisin.add(voisinValide);
+      case 0 -> configurePointedArea(target, baseSize, rows - 1, false);
+      case 1 -> configurePointedArea(target, cols - baseSize - 1, rows - 1, false);
+      case 2 -> configureSideArea(target, 0, rows / 2);
+      case 3 -> configurePointedArea(target, baseSize, 0, true);
+      case 4 -> configurePointedArea(target, cols - baseSize - 1, 0, true);
+      case 5 -> configureSideArea(target, cols - 1, rows / 2);
+      default -> {
       }
     }
-    return Collections.unmodifiableSet(voisin);
+    return Collections.unmodifiableSet(target);
   }
 
   @Override
-  public Field getExtendedNeighbour(Field originField, Field voisinField) {
-    if (!getAllFields().contains(originField)
-        || !getAllFields().contains(voisinField)) {
-      throw new RuntimeException(
-          new FieldException("Invalid origin or via field: " + originField + " / " + voisinField));
+  public Set<Field> getNeighbours(Field field) throws FieldException {
+    if (!getAllFields().contains(field)) {
+      throw new FieldException("Field not on board: " + field);
     }
-    // Direction du saut
-    int directX = voisinField.x() - originField.x();
-    int directY = voisinField.y() - originField.y();
-    if (directX > 1 || directY > 1) {
-      throw new FieldException("Via field is not a direct neighbor of origin: " + voisinField);
+    int x = field.x();
+    int y = field.y();
+    int[][] dirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}, {-1, -1}, {1, 1},
+        {-1, 1}, {1, -1}, {0, -2}, {0, 2}};
+    Set<Field> neigh = new HashSet<>();
+    for (int[] d : dirs) {
+      Field f2 = new Field(x + d[0], y + d[1]);
+      if (getAllFields().contains(f2)) {
+        neigh.add(f2);
+      }
     }
-    // Coordonnées du voisin étendu
-    Field saut = new Field(originField.x() + 2 * directX, originField.y() + 2 * directY);
-    if (getAllFields().contains(saut)) {
-      return saut;
-    } else {
-      return null;
+    return Collections.unmodifiableSet(neigh);
+  }
+
+  @Override
+  public Field getExtendedNeighbour(Field origin, Field via) throws FieldException {
+    if (!getAllFields().contains(origin) || !getAllFields().contains(via)) {
+      throw new FieldException("Invalid origin or via: " + origin + "/" + via);
     }
+    int dx = via.x() - origin.x();
+    int dy = via.y() - origin.y();
+    if (Math.abs(dx) > 1 || Math.abs(dy) > 1) {
+      throw new FieldException("Via is not adjacent: " + via);
+    }
+    Field jump = new Field(origin.x() + 2 * dx, origin.y() + 2 * dy);
+    return getAllFields().contains(jump) ? jump : null;
   }
 }

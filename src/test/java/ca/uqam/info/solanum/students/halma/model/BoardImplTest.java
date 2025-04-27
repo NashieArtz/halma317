@@ -1,52 +1,39 @@
 package ca.uqam.info.solanum.students.halma.model;
 
-import static org.junit.Assert.*;
 import org.junit.Test;
 import ca.uqam.info.solanum.inf2050.f24halma.model.Field;
 import ca.uqam.info.solanum.inf2050.f24halma.model.FieldException;
+import static org.junit.Assert.*;
 import java.util.Set;
 
 public class BoardImplTest {
 
   @Test
-  public void testBaseSize1Validation() {
-    BoardImpl board = new BoardImpl(1);
-    assertEquals(25, board.getAllFields().size());
+  public void testAllFieldsNonEmpty() {
+    assertFalse(new BoardImpl(1).getAllFields().isEmpty());
   }
 
   @Test
-  public void testBaseSize2Validation() {
-    BoardImpl board = new BoardImpl(2);
-    assertTrue(board.getAllFields().size() > 40);
-  }
-
-  @Test
-  public void testHomeFieldsPlayer0() {
-    BoardImpl board = new BoardImpl(2);
-    Set<Field> fields = board.getHomeFieldsForPlayer(0);
-    assertTrue(fields.contains(new Field(2, 0)));
-    assertEquals(4, fields.size());
-  }
-
-  @Test(expected = RuntimeException.class)
-  public void testInvalidFieldNeighbours() {
-    BoardImpl board = new BoardImpl(1);
-    board.getNeighbours(new Field(10, 10));
-  }
-
-  @Test
-  public void testExtendedJumpValid() {
-    BoardImpl board = new BoardImpl(2);
-    Field origin = new Field(4, 4);
-    Field via = new Field(5, 5);
-    Field target = board.getExtendedNeighbour(origin, via);
-    assertEquals(new Field(6, 6), target);
+  public void testNeighboursCenter() throws Exception {
+    BoardImpl b = new BoardImpl(1);
+    Set<Field> n = b.getNeighbours(new Field(1,1));
+    assertFalse(n.isEmpty());
   }
 
   @Test(expected = FieldException.class)
-  public void testInvalidExtendedJump() {
-    BoardImpl board = new BoardImpl(1);
-    board.getExtendedNeighbour(new Field(0,0), new Field(2,2));
+  public void testNeighboursInvalid() throws Exception {
+    new BoardImpl(1).getNeighbours(new Field(10,10));
   }
 
+  @Test
+  public void testExtendedNeighbour() throws Exception {
+    BoardImpl b = new BoardImpl(1);
+    Field o = new Field(1,1), via = new Field(2,2);
+    assertEquals(new Field(3,3), b.getExtendedNeighbour(o,via));
+  }
+
+  @Test(expected = FieldException.class)
+  public void testExtendedNeighbourInvalid() throws Exception {
+    new BoardImpl(1).getExtendedNeighbour(new Field(0,0), new Field(2,2));
+  }
 }

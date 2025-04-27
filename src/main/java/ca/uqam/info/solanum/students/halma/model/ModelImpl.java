@@ -31,48 +31,36 @@ public class ModelImpl implements Model, ModelReadOnly {
    */
   public ModelImpl(int baseSize, String[] playerNames) {
     this.board = new BoardImpl(baseSize);
-    this.playerNames = playerNames != null ? playerNames.clone() : new String[0];
-    this.currentPlayer = 0;
-    // Initialiser à non-occupé
-    int colonnes = 4 * baseSize + 1;
-    int lignes = 6 * baseSize + 1;
-    this.occupant = new int[colonnes][lignes];
-    this.baseSizeBoard = baseSize;
-    for (int y = 0; y < lignes; y++) {
-      for (int x = 0; x < colonnes; x++) {
-        occupant[x][y] = -1;
-      }
+    this.playerNames = playerNames.clone();
+    this.occupant = new int[4 * baseSize + 1][6 * baseSize + 1];
+    for (int[] row : occupant) {
+      Arrays.fill(row, -1);
     }
-    // Occuper le field par le joueur
-    for (int i = 0; i < this.playerNames.length; i++) {
-      for (Field f : board.getHomeFieldsForPlayer(i)) {
-        occupant[f.y()][f.x()] = i;
+    this.currentPlayer = 0;
+    for (int p = 0; p < playerNames.length; p++) {
+      for (Field f : board.getHomeFieldsForPlayer(p)) {
+        occupant[f.x()][f.y()] = p;
       }
     }
   }
 
   @Override
   public void occupyField(int playerNum, Field field) throws FieldException {
-    // Check si un Field est sur le plateau.
     if (!board.getAllFields().contains(field)) {
-      throw new FieldException("Field invalide: " + field);
+      throw new FieldException("Invalid field: " + field);
     }
-    // Occupe le field.
-    occupant[field.y()][field.x()] = playerNum;
+    occupant[field.x()][field.y()] = playerNum;
   }
 
   @Override
   public void clearField(Field field) throws FieldException, ModelAccessConsistencyException {
-    // Check si un field est sur le plateau
     if (!board.getAllFields().contains(field)) {
-      throw new FieldException("Field occupé: " + field);
+      throw new FieldException("Invalid field: " + field);
     }
-    // Check si le field est occupé
-    if (occupant[field.y()][field.x()] == -1) {
-      throw new ModelAccessConsistencyException("Field non-occupé " + field);
+    if (occupant[field.x()][field.y()] < 0) {
+      throw new ModelAccessConsistencyException("Field not occupied: " + field);
     }
-    // Libère le field.
-    occupant[field.y()][field.x()] = -1;
+    occupant[field.x()][field.y()] = -1;
   }
 
   @Override
@@ -90,31 +78,12 @@ public class ModelImpl implements Model, ModelReadOnly {
   }
 
   @Override
-  public Set<Field> getPlayerFields(int i) {
+  public Set<Field> getPlayerFields(int playerIndex) {
     Set<Field> result = new HashSet<>();
-    int colonnes = 4 * baseSizeBoard + 1;
-    int lignes = 6 * baseSizeBoard + 1;
-    switch (i) {
-      case 0:
-        result.add(new Field(0, colonnes - 2));
-        break;
-      case 1:
-        result.add(new Field(i * baseSizeBoard + 2, 0));
-        break;
-      case 2:
-        result.add(new Field(i * baseSizeBoard + 1, colonnes + 1));
-        break;
-      case 3:
-        result.add(new Field(colonnes - 1, lignes - baseSizeBoard - 1));
-        break;
-      case 4:
-        result.add(new Field(baseSizeBoard, lignes / 2));
-        break;
-      case 5:
-        result.add(new Field(colonnes - baseSizeBoard - 1, lignes / 2));
-        break;
-      default:
-        break;
+    for (Field f : board.getAllFields()) {
+      if (occupant[f.x()][f.y()] == playerIndex) {
+        result.add(f);
+      }
     }
     return Collections.unmodifiableSet(result);
   }
@@ -131,37 +100,31 @@ public class ModelImpl implements Model, ModelReadOnly {
 
   @Override
   public boolean isClear(Field field) throws FieldException {
-    //Variable local
-    boolean clear = false;
-    //Valider si le field existe dans le board
     if (!board.getAllFields().contains(field)) {
-      throw new FieldException("Field occupé: " + field);
+      throw new FieldException("Invalid field: " + field);
     }
-    //Si le field est égale a -1 alors renvoyer vrai
-    //sinon on renvoi faux
-    if (occupant[field.y()][field.x()] == -1) {
-      clear = true;
-    }
-    return clear;
+    return occupant[field.x()][field.y()] < 0;
   }
 
   @Override
-  public boolean equals(Object obj) {
-    if (this == obj) {
+  public boolean equals(Object o) {
+    if (this == o) {
       return true;
     }
-    if (obj == null || getClass() != obj.getClass()) {
+    if (!(o instanceof ModelImpl)) {
       return false;
     }
-    ModelImpl model = (ModelImpl) obj;
-    return Objects.equals(board, model.board)
-        && Arrays.equals(playerNames, model.playerNames)
-        && Arrays.deepEquals(occupant, model.occupant);
+    ModelImpl that = (ModelImpl) o;
+    return Arrays.deepEquals(occupant, that.occupant)
+        && Objects.equals(board, that.board)
+        && Arrays.equals(playerNames, that.playerNames);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(baseSize, Arrays.hashCode(playerNames), Arrays.deepHashCode(occupant));
+    int result = Objects.hash(board, Arrays.hashCode(playerNames));
+    result = 31 * result + Arrays.deepHashCode(occupant);
+    return result;
   }
 }
 

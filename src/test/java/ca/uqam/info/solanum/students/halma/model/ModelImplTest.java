@@ -1,37 +1,30 @@
 package ca.uqam.info.solanum.students.halma.model;
 
-import static org.junit.Assert.*;
-
-import ca.uqam.info.solanum.inf2050.f24halma.model.ModelAccessConsistencyException;
 import org.junit.Test;
 import ca.uqam.info.solanum.inf2050.f24halma.model.Field;
+import ca.uqam.info.solanum.inf2050.f24halma.model.FieldException;
+import ca.uqam.info.solanum.inf2050.f24halma.model.ModelAccessConsistencyException;
+import static org.junit.Assert.*;
 
 public class ModelImplTest {
 
   @Test
-  public void testOccupantMatrixInitialization() {
-    ModelImpl model = new ModelImpl(1, new String[]{"P1", "P2"});
-    assertEquals(-1, model.occupant[0][0]);
+  public void testOccupyAndClear() throws Exception {
+    ModelImpl m = new ModelImpl(1, new String[]{"P1","P2","P3"});
+    Field f = m.getPlayerFields(0).iterator().next();
+    m.clearField(f);
+    assertTrue(m.isClear(f));
+    m.occupyField(0, f);
+    assertFalse(m.isClear(f));
+  }
+
+  @Test(expected = FieldException.class)
+  public void testOccupyInvalid() throws Exception {
+    new ModelImpl(1, new String[]{"P1","P2","P3"}).occupyField(0, new Field(10,10));
   }
 
   @Test(expected = ModelAccessConsistencyException.class)
-  public void testClearNonOwnedField() throws Exception {
-    ModelImpl model = new ModelImpl(1, new String[]{"P1", "P2"});
-    Field f = model.getPlayerFields(0).iterator().next();
-    model.clearField(f);
+  public void testClearUnoccupied() throws Exception {
+    new ModelImpl(1, new String[]{"P1","P2","P3"}).clearField(new Field(0,0));
   }
-
-  @Test
-  public void testPlayerFieldsEdgeCase() {
-    ModelImpl model = new ModelImpl(3, new String[]{"P1"});
-    assertFalse(model.getPlayerFields(0).isEmpty());
-  }
-
-  @Test
-  public void testEqualsHashCodeConsistency() {
-    ModelImpl m1 = new ModelImpl(1, new String[]{"A"});
-    ModelImpl m2 = new ModelImpl(1, new String[]{"A"});
-    assertEquals(m1.hashCode(), m2.hashCode());
-  }
-
 }

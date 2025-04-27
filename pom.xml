@@ -14,24 +14,39 @@
     </properties>
 
     <!-- Définition des profils Maven -->
+    <!-- Profils pour sélectionner l'IA -->
     <profiles>
-        <!-- Profil par défaut : IA MadMax -->
+        <!-- Profil MadMax (par défaut) -->
         <profile>
             <id>madmax</id>
-            <activation>
-                <activeByDefault>true</activeByDefault>
-            </activation>
+            <activation><activeByDefault>true</activeByDefault></activation>
             <properties>
-                <!-- propriété lue par votre code pour choisir l’IA -->
-                <halma.ia>MadMax</halma.ia>
+                <!-- Classe utilisée pour l'IA -->
+                <ai.class>ca.uqam.info.solanum.students.halma.ai.MadMaxMoveSelector</ai.class>
             </properties>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>org.codehaus.mojo</groupId>
+                        <artifactId>exec-maven-plugin</artifactId>
+                        <version>3.0.0</version>
+                        <executions><execution><goals><goal>java</goal></goals></execution></executions>
+                        <configuration>
+                            <mainClass>ca.uqam.info.solanum.students.halma.view.DefaultConsoleLauncher</mainClass>
+                            <arguments>
+                                <argument>${ai.class}</argument>
+                            </arguments>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
         </profile>
 
-        <!-- Profil pour IA Keksli -->
+        <!-- Profil Keksli -->
         <profile>
             <id>keksli</id>
             <properties>
-                <halma.ia>Keksli</halma.ia>
+                <ai.class>ca.uqam.info.solanum.students.halma.ai.KeksliMoveSelector</ai.class>
             </properties>
         </profile>
     </profiles>

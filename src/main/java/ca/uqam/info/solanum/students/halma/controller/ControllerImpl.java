@@ -1,10 +1,11 @@
 package ca.uqam.info.solanum.students.halma.controller;
 
 import ca.uqam.info.solanum.inf2050.f24halma.controller.Controller;
+import ca.uqam.info.solanum.inf2050.f24halma.controller.IllegalMoveException;
 import ca.uqam.info.solanum.inf2050.f24halma.controller.ModelFactory;
 import ca.uqam.info.solanum.inf2050.f24halma.controller.Move;
-import ca.uqam.info.solanum.inf2050.f24halma.model.Field;
 import ca.uqam.info.solanum.inf2050.f24halma.model.FieldException;
+import ca.uqam.info.solanum.inf2050.f24halma.model.ModelAccessConsistencyException;
 import ca.uqam.info.solanum.inf2050.f24halma.model.ModelReadOnly;
 import ca.uqam.info.solanum.students.halma.model.ModelImpl;
 import java.util.ArrayList;
@@ -12,78 +13,75 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Le type de controlleur.
+ * Implementation of the game controller for Halma TP4.
+ * Delegates game logic to ModelImpl and manages player moves.
  */
 public class ControllerImpl implements Controller {
+
   private final ModelImpl model;
 
   /**
-   * Constructeur qui initialise le contrôleur en utilisant une fabrique de modèles.
+   * Constructs the ControllerImpl with a ModelFactory, board size, and player names.
    *
-   * @param modelFactory la fabrique de modèles utilisée pour créer un modèle.
-   * @param baseSize     la taille de base du plateau.
-   * @param playerNames  les noms des joueurs participant au jeu.
-   * @throws IllegalArgumentException si la fabrique ou les paramètres sont invalides.
+   * @param mf factory to create the game model
+   * @param baseSize star board size parameter
+   * @param names player names or "AI"
+   * @throws IllegalArgumentException if mf is null
    */
-  public ControllerImpl(ModelFactory modelFactory, int baseSize, String[] playerNames) {
-    if (modelFactory == null) {
-      throw new IllegalArgumentException("La fabrique de modèle ne peut pas être nulle.");
+  public ControllerImpl(ModelFactory mf, int baseSize, String[] names) {
+    if (mf == null) {
+      throw new IllegalArgumentException("ModelFactory cannot be null");
     }
-    if (baseSize <= 0) {
-      throw new IllegalArgumentException("La taille de base doit être positive.");
-    }
-    if (playerNames == null || playerNames.length < 2) {
-      throw new IllegalArgumentException("Au moins deux joueurs doivent être fournis.");
-    }
-    this.model = (ModelImpl) modelFactory.createModel(baseSize, playerNames);
+    this.model = (ModelImpl) mf.createModel(baseSize, names);
   }
 
   @Override
   public ModelReadOnly getModel() {
-    return this.model;
+    return model;
   }
 
   @Override
   public List<Move> getPlayerMoves() {
-    int currentPlayerIndex = model.getCurrentPlayer();
-    Set<Field> playerFields = model.getPlayerFields(currentPlayerIndex);
-    List<Move> possibleMoves = new ArrayList<>();
-    // Check pour un mouvement simple ou un saut
-    for (Field field : playerFields) {
-      Set<Field> neighbours = model.getBoard().getNeighbours(field);
-      // Vérifier chaque case voisine
-      for (Field neighbour : neighbours) {
-        // Champ vide = mouvement simple
-        if (model.isClear(neighbour)) {
-          possibleMoves.add(new Move(field, neighbour, false));
-        } else {
-          // Champ occupée
-          Field jumpTarget = model.getBoard().getExtendedNeighbour(field, neighbour);
-          if (jumpTarget != null && model.isClear(jumpTarget)) {
-            possibleMoves.add(new Move(field, jumpTarget, true));
+    Set<ca.uqam.info.solanum.inf2050.f24halma.model.Field> fields =
+        model.getPlayerFields(model.getCurrentPlayer());
+    List<Move> moves = new ArrayList<>();
+    for (ca.uqam.info.solanum.inf2050.f24halma.model.Field f : fields) {
+      for (ca.uqam.info.solanum.inf2050.f24halma.model.Field n :
+          model.getBoard().getNeighbours(f)) {
+        try {
+          if (model.isClear(n)) {
+            moves.add(new Move(f, n, false));
+          } else {
+            ca.uqam.info.solanum.inf2050.f24halma.model.Field j =
+                model.getBoard().getExtendedNeighbour(f, n);
+            if (j != null && model.isClear(j)) {
+              moves.add(new Move(f, j, true));
+            }
           }
+        } catch (FieldException ex) {
+          // ignore invalid neighbour
         }
       }
     }
-    return possibleMoves;
+    return moves;
   }
 
   @Override
-  public void performMove(Move move) {
+  public void performMove(Move m) {
     try {
-      model.occupyField(model.getCurrentPlayer(), move.target());
-      model.clearField(move.origin());
-    } catch (FieldException e) {
-      throw new IllegalStateException("Impossible d'effectuer le mouvement : " + e.getMessage(), e);
+      model.occupyField(model.getCurrentPlayer(), m.target());
+      model.clearField(m.origin());
+    } catch (FieldException | ModelAccessConsistencyException ex) {
+      throw new IllegalMoveException("Cannot perform move: " + ex.getMessage());
     }
   }
 
   @Override
   public boolean isGameOver() {
-    for (int playerIndex = 0; playerIndex < model.getPlayerNames().length; playerIndex++) {
-      Set<Field> targetFields = model.getBoard().getTargetFieldsForPlayer(playerIndex);
-      Set<Field> playerFields = model.getPlayerFields(playerIndex);
-      if (targetFields.containsAll(playerFields)) {
+    for (int i = 0; i < model.getPlayerNames().length; i++) {
+      Set<ca.uqam.info.solanum.inf2050.f24halma.model.Field> target =
+          model.getBoard().getTargetFieldsForPlayer(i);
+      if (target.containsAll(model.getPlayerFields(i))) {
         return true;
       }
     }
