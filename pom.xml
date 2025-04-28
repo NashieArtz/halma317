@@ -119,67 +119,6 @@
                 </plugins>
             </build>
         </profile>
-
-        <!-- Profile Keksli-->
-        <profile>
-            <id>keksli</id>
-            <properties>
-                <ai.class>ca.uqam.info.solanum.students.halma.ai.KeksliMoveSelector</ai.class>
-            </properties>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
-                        <version>3.0.0</version>
-                        <executions>
-                            <execution>
-                                <goals>
-                                    <goal>java</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <mainClass>ca.uqam.info.solanum.students.halma.view.DefaultConsoleLauncher</mainClass>
-                            <arguments>
-                                <argument>${ai.class}</argument>
-                            </arguments>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
-
-        <!-- Profile Mutation -->
-        <profile>
-            <id>mutation</id>
-            <activation>
-                <activeByDefault>false</activeByDefault>
-            </activation>
-            <build>
-                <plugins>
-                    <plugin>
-                        <groupId>org.pitest</groupId>
-                        <artifactId>pitest-maven</artifactId>
-                        <version>1.17.1</version>
-                        <executions>
-                            <execution>
-                                <id>mutationCoverage</id>
-                                <phase>test</phase>
-                                <goals>
-                                    <goal>mutationCoverage</goal>
-                                </goals>
-                            </execution>
-                        </executions>
-                        <configuration>
-                            <excludedClasses>ca/uqam/info/solanum/students/halma/view/DefaultConsoleLauncher.java</excludedClasses>
-                            <excludedClasses>ca/uqam/info/solanum/students/halma/ai/KeksliMoveSelector.java</excludedClasses>
-                            <excludedClasses>ca/uqam/info/solanum/students/halma/ai/MadMaxMoveSelector.java</excludedClasses>
-                        </configuration>
-                    </plugin>
-                </plugins>
-            </build>
-        </profile>
     </profiles>
 
     <build>
@@ -331,6 +270,26 @@
                         <configuration><includes><include>**/*IT.java</include></includes></configuration>
                     </execution>
                 </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.pitest</groupId>
+                <artifactId>pitest-maven</artifactId>
+                <version>1.17.1</version>
+                <executions>
+                    <execution>
+                        <id>mutationCoverage</id>
+                        <goals>
+                            <goal>mutationCoverage</goal>
+                        </goals>
+                        <phase>test</phase>
+                    </execution>
+                </executions>
+                <configuration>
+                    <excludedClasses>ca/uqam/info/solanum/students/halma/view/DefaultConsoleLauncher.java</excludedClasses>
+                    <excludedClasses>ca/uqam/info/solanum/students/halma/ai/KeksliMoveSelector.java</excludedClasses>
+                    <excludedClasses>ca/uqam/info/solanum/students/halma/ai/MadMaxMoveSelector.java</excludedClasses>
+                </configuration>
             </plugin>
         </plugins>
     </build>
