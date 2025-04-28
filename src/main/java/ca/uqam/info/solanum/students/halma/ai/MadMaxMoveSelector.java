@@ -16,7 +16,7 @@ public class MadMaxMoveSelector implements MoveSelector {
   /**
    * Constructeur par défaut.
    *
-   * @param seed test
+   * @param seed Randomizer pour comportement reproductible
    */
   public MadMaxMoveSelector(int seed) {
   }

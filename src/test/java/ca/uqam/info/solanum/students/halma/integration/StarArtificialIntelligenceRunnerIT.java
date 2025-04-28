@@ -10,9 +10,10 @@ import ca.uqam.info.solanum.students.halma.controller.StarModelFactory;
 import ca.uqam.info.solanum.students.halma.controller.ControllerImpl;
 
 /**
- * Integration test for AI runners (suffixe IT nécessaire).
+ * Tests d'intégrations.
  */
-public class StarArtificialIntelligenceRunnerIT extends AbstractStarArtificialIntelligenceRunnerIntegrationTest {
+public class StarArtificialIntelligenceRunnerIT
+    extends AbstractStarArtificialIntelligenceRunnerIntegrationTest {
 
   @Override
   public MoveSelector getKeksli() {
@@ -30,8 +31,8 @@ public class StarArtificialIntelligenceRunnerIT extends AbstractStarArtificialIn
   }
 
   @Override
-  public Controller getHalmaController(ModelFactory modelFactory, int baseSize, String[] playerNames) {
-    return new ControllerImpl(modelFactory, baseSize, playerNames);
+  public Controller getHalmaController(ModelFactory factory, int baseSize, String[] players) {
+    return new ControllerImpl(factory, baseSize, players);
   }
 
   @Override
