@@ -16,6 +16,12 @@ import java.util.List;
  */
 public class DefaultConsoleLauncher {
   /**
+   * Constructeur par défaut.
+   */
+  public DefaultConsoleLauncher() {
+  }
+
+  /**
    * Point d’entrée de l’application.
    *
    * @param args premier argument = taille de base, suivi des noms de joueurs ou "IA
@@ -142,9 +148,9 @@ public class DefaultConsoleLauncher {
   /**
    * Choisis le prochain mouvement.
    *
-   * @param controller controller de la partie
+   * @param controller        controller de la partie
    * @param textualVisualizer affichage
-   * @param selectors tableau de MoveSelectors
+   * @param selectors         tableau de MoveSelectors
    */
   private static void performMove(Controller controller, TextualVisualizer textualVisualizer,
                                   MoveSelector[] selectors) {

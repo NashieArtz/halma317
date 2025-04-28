@@ -171,7 +171,8 @@ public class BoardImpl implements Board {
   public Field getExtendedNeighbour(Field fieldOrigin, Field fieldNeighbour) throws FieldException {
     // Vérifier l'existance des cases
     if (!getAllFields().contains(fieldOrigin) || !getAllFields().contains(fieldNeighbour)) {
-      throw new FieldException("Invalid origin or fieldNeighbour: " + fieldOrigin + "/" + fieldNeighbour);
+      throw new FieldException(
+          "Field ou NeighbhourField invalide: " + fieldOrigin + "/" + fieldNeighbour);
     }
     int dirX = fieldNeighbour.x() - fieldOrigin.x();
     int dirY = fieldNeighbour.y() - fieldOrigin.y();

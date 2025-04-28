@@ -12,7 +12,6 @@ import java.util.Random;
 public class MadMaxMoveSelector implements MoveSelector {
   private final Random random = new Random(42);
 
-
   /**
    * Constructeur par défaut.
    *

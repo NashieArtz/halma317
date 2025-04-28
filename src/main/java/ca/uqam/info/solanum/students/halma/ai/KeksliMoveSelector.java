@@ -10,6 +10,12 @@ import java.util.List;
  */
 public class KeksliMoveSelector implements MoveSelector {
   /**
+   * Constructeur par défaut.
+   */
+  public KeksliMoveSelector() {
+  }
+
+  /**
    * Sélectionne un mouvement parmi une liste de mouvements possibles.
    *
    * @param allPossibleMoves la liste des mouvements possibles
