@@ -9,100 +9,105 @@ import ca.uqam.info.solanum.inf2050.f24halma.view.TextualVisualizer;
 import ca.uqam.info.solanum.students.halma.controller.ControllerImpl;
 import ca.uqam.info.solanum.students.halma.controller.StarModelFactory;
 import java.util.Arrays;
+import java.util.List;
 
 /**
- * Console launcher for Halma TP4, refactored to reduce cyclomatic complexity.
+ * Console launcher pour Halma TP4.
  */
 public class DefaultConsoleLauncher {
-
   /**
-   * Entry point of the application.
+   * Point d’entrée de l’application.
    *
-   * @param args first argument is baseSize, followed by player names or "AI.
+   * @param args premier argument = taille de base, suivi des noms de joueurs ou "IA
    */
   public static void main(String[] args) {
-    LaunchConfig cfg = parseArgs(args);
-    MoveSelector[] selectors = createSelectors(cfg.playerNames);
-    playGame(cfg, selectors);
+    Tp4 config = analyserArguments(args);
+    MoveSelector[] selecteurrs = createSelectors(config.playerNames);
+    playGame(config, selecteurrs);
   }
 
   /**
-   * Parses and validates command-line arguments.
+   * Analyse et valide les arguments passés en ligne de commande.
    *
-   * @param args input arguments
-   * @return LaunchConfig containing baseSize and playerNames
+   * @param args arguments utilisateur
+   * @return Tp4 contenant baseSize and playerNames
    */
-  private static LaunchConfig parseArgs(String[] args) {
+  private static Tp4 analyserArguments(String[] args) {
     validateArgsLength(args);
-    int baseSize = parseBaseSize(args[0]);
+    int baseSize = parserBaseSize(args[0]);
     String[] playerNames = extractPlayerNames(args);
     validatePlayerCount(baseSize, playerNames);
-    return new LaunchConfig(baseSize, playerNames);
+    return new Tp4(baseSize, playerNames);
   }
 
   /**
-   * test.
+   * Vérifie que le tableau d’arguments est non nul et contient au moins deux éléments.
    *
-   * @param args test
+   * @param args arguments utilisateur
    */
   private static void validateArgsLength(String[] args) {
     if (args == null || args.length < 2) {
-      usageAndExit();
+      afficherEtSortir();
     }
   }
 
   /**
-   * test.
+   * Convertit le premier argument en entier (baseSize).
    *
-   * @param arg test
+   * @param arg premier argument
+   * @return baseSize
    */
-  private static int parseBaseSize(String arg) {
+  private static int parserBaseSize(String arg) {
     try {
       return Integer.parseInt(arg);
     } catch (NumberFormatException e) {
-      System.err.println("Error: first argument must be an integer (baseSize).");
-      usageAndExit();
-      return -1; // unreachable
+      System.err.println("Erreur: l'argument doit être un entier.");
+      afficherEtSortir();
+      return -1;
     }
   }
 
   /**
-   * test.
+   * Extrait les noms de joueurs.
    *
-   * @param args test
+   * @param args argument utilisateur
+   * @return tableau noms des joueurs
    */
   private static String[] extractPlayerNames(String[] args) {
     return Arrays.copyOfRange(args, 1, args.length);
   }
 
   /**
-   * test.
+   * Vérifie si le nombre de joueurs correspond à la taille de la base.
    *
-   * @param baseSize test
-   * @param names test
+   * @param baseSize    taille du jeu
+   * @param playerNames tableau des noms des joueurs
    */
-  private static void validatePlayerCount(int baseSize, String[] names) {
+  private static void validatePlayerCount(int baseSize, String[] playerNames) {
     int expected = (baseSize == 1) ? 3 : (baseSize == 2) ? 6 : -1;
-    if (expected < 0 || names.length != expected) {
-      System.err.printf("Error: baseSize=%d requires %d players, got %d.%n",
-          baseSize, expected, names.length);
-      usageAndExit();
+    if (expected < 0 || playerNames.length != expected) {
+      System.err.printf("Erreur: baseSize=%d doit avoit %d players. Retour: %d.%n",
+          baseSize, expected, playerNames.length);
+      afficherEtSortir();
     }
   }
 
   /**
-   * Instantiates MoveSelectors: human or dynamic AI.
+   * Créer un tableau des choix de mouvement, selon les noms.
    *
-   * @param names player names or "AI"
-   * @return array of MoveSelector
+   * @param playerNames noms de joueurs ou AI
+   * @return tableau de MoveSelector
    */
-  private static MoveSelector[] createSelectors(String[] names) {
-    String aiClass = System.getProperty("ai.class");
-    MoveSelector[] selectors = new MoveSelector[names.length];
-    for (int i = 0; i < names.length; i++) {
-      if ("AI".equalsIgnoreCase(names[i])) {
-        selectors[i] = instantiateAi(aiClass);
+  private static MoveSelector[] createSelectors(String[] playerNames) {
+    // Récupère la classe IA
+    String aiName = System.getProperty("ai.class");
+    MoveSelector[] selectors = new MoveSelector[playerNames.length];
+    for (int i = 0; i < playerNames.length; i++) {
+      if ("AI".equalsIgnoreCase(playerNames[i])) {
+        // IA
+        selectors[i] = instantiateAi(aiName);
       } else {
+        // Humain
         selectors[i] = new InteractiveMoveSelector();
       }
     }
@@ -110,72 +115,100 @@ public class DefaultConsoleLauncher {
   }
 
   /**
-   * Runs the main game loop.
+   * Lance la boucle du jeu.
+   * Affiche l'état, demande au MoveSelector de choisir un mouvement,
+   * exécute le mouvement, receommence.
    *
-   * @param cfg configuration of the launch
-   * @param selectors MoveSelectors for each player
+   * @param config    configuration du jeu
+   * @param selectors MoveSelectors pour chaque joueur
    */
-  private static void playGame(LaunchConfig cfg, MoveSelector[] selectors) {
-    Controller ctrl = new ControllerImpl(
-        new StarModelFactory(), cfg.baseSize, cfg.playerNames);
-    TextualVisualizer viz = new TextualVisualizer(true);
-
-    while (!ctrl.isGameOver()) {
-      viz.clearScreen();
-      System.out.println(viz.stringifyModel(ctrl.getModel()));
-      System.out.println(viz.getCurrentPlayerAnnouncement(ctrl.getModel()));
-      System.out.println(viz.announcePossibleMoves(ctrl.getPlayerMoves()));
-      performMove(ctrl, viz, selectors);
+  private static void playGame(Tp4 config, MoveSelector[] selectors) {
+    Controller controller = new ControllerImpl(
+        new StarModelFactory(), config.baseSize, config.playerNames);
+    TextualVisualizer textualVisualizer = new TextualVisualizer(true);
+    // Boucle du jeu
+    while (!controller.isGameOver()) {
+      // Efface la console
+      textualVisualizer.clearScreen();
+      System.out.println(textualVisualizer.stringifyModel(controller.getModel()));
+      System.out.println(textualVisualizer.getCurrentPlayerAnnouncement(controller.getModel()));
+      System.out.println(textualVisualizer.announcePossibleMoves(controller.getPlayerMoves()));
+      performMove(controller, textualVisualizer, selectors);
     }
-    System.out.println(viz.stringifyModel(ctrl.getModel()));
+    System.out.println(textualVisualizer.stringifyModel(controller.getModel()));
     System.out.println("GAME OVER!");
   }
 
   /**
-   * Selects and performs the next move.
+   * Choisis le prochain mouvement.
+   *
+   * @param controller controller de la partie
+   * @param textualVisualizer affichage
+   * @param selectors tableau de MoveSelectors
    */
-  private static void performMove(Controller ctrl, TextualVisualizer viz,
+  private static void performMove(Controller controller, TextualVisualizer textualVisualizer,
                                   MoveSelector[] selectors) {
-    var moves = ctrl.getPlayerMoves();
-    Move selected = (moves.size() > 1)
-        ? selectors[ctrl.getModel().getCurrentPlayer()].selectMove(moves)
-        : moves.getFirst();
-    System.out.println(viz.getChoseMoveAnnouncement(
-        selected, ctrl.getModel().getCurrentPlayer()));
+    // Liste des mouvements disponibles
+    List<Move> moves = controller.getPlayerMoves();
+    Move selector;
+    if (moves.size() > 1) {
+      int currentPlayer = controller.getModel().getCurrentPlayer();
+      // Appel humain/AI
+      selector = selectors[currentPlayer].selectMove(moves);
+    } else {
+      selector = moves.get(0);
+    }
+    // Annonce du choix
+    System.out.println(
+        textualVisualizer.getChoseMoveAnnouncement(
+            selector,
+            controller.getModel().getCurrentPlayer()
+        )
+    );
     try {
-      ctrl.performMove(selected);
+      controller.performMove(selector);
     } catch (IllegalMoveException e) {
-      System.err.println("Illegal move: " + e.getMessage());
+      System.err.println("Mouvement illégal: " + e.getMessage());
       System.exit(1);
     }
     System.out.println("\n\n");
   }
 
   /**
-   * Dynamically loads and instantiates an AI MoveSelector.
+   * Charge dynamiquement en instnacie l'IA.
    *
-   * @param aiClass fully qualified class name
-   * @return MoveSelector instance
+   * @param aiName nom complet de la classe IA
+   * @return instance de MoveSelector
+   * @throws RuntimeException si la classe n'existe pas ou ne peut pas être instanciée
    */
-  private static MoveSelector instantiateAi(String aiClass) {
+  private static MoveSelector instantiateAi(String aiName) {
+    // Vérification de la classe AI
+    if (aiName == null || aiName.isEmpty()) {
+      throw new IllegalArgumentException("Propriété AI non définie");
+    }
     try {
-      Class<?> cl = Class.forName(aiClass);
-      return (MoveSelector) cl.getDeclaredConstructor().newInstance();
+      // Charge la classe en mémoire
+      Class<?> classe = Class.forName(aiName);
+      // Nouvelle instance
+      return (MoveSelector) classe.getConstructor().newInstance();
+    } catch (ClassNotFoundException e) {
+      throw new RuntimeException("IA introuvable: " + aiName, e);
     } catch (Exception e) {
-      throw new RuntimeException("Cannot load AI class: " + aiClass, e);
+      throw new RuntimeException("Erreur durant de la création de l'IA: " + aiName, e);
     }
   }
 
   /**
-   * Prints usage message and exits.
+   * Imprime la commande d'usage.
    */
-  private static void usageAndExit() {
-    System.err.println("Usage: java -jar halma.jar <baseSize> <player1> ... <playerN>");
+  private static void afficherEtSortir() {
+    System.err.println("Commande: java -jar halma.jar <baseSize> <player1> ... <playerN>");
     System.exit(1);
   }
 
   /**
-   * Holder for launch configuration.
+   * Stocker la configuration de lancement.
    */
-  private record LaunchConfig(int baseSize, String[] playerNames) {}
+  private record Tp4(int baseSize, String[] playerNames) {
+  }
 }

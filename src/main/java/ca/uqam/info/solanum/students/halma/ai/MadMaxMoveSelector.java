@@ -10,10 +10,11 @@ import java.util.Random;
  * IA Mad Max : trie la liste des coups puis choisit aléatoirement un coup parmi la liste triée.
  */
 public class MadMaxMoveSelector implements MoveSelector {
-  private final Random rng = new Random(42);
+  private final Random random = new Random(42);
+
 
   /**
-   * test.
+   * Constructeur par défaut.
    *
    * @param seed test
    */
@@ -32,6 +33,6 @@ public class MadMaxMoveSelector implements MoveSelector {
       return null;
     }
     Collections.sort(allPossibleMoves);
-    return allPossibleMoves.get(rng.nextInt(allPossibleMoves.size()));
+    return allPossibleMoves.get(random.nextInt(allPossibleMoves.size()));
   }
 }

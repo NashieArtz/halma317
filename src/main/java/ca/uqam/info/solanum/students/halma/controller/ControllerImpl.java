@@ -8,31 +8,31 @@ import ca.uqam.info.solanum.inf2050.f24halma.model.FieldException;
 import ca.uqam.info.solanum.inf2050.f24halma.model.ModelAccessConsistencyException;
 import ca.uqam.info.solanum.inf2050.f24halma.model.ModelReadOnly;
 import ca.uqam.info.solanum.students.halma.model.ModelImpl;
+import ca.uqam.info.solanum.inf2050.f24halma.model.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
 /**
- * Implementation of the game controller for Halma TP4.
- * Delegates game logic to ModelImpl and manages player moves.
+ * Implémentation du contrôleur du jeu.
  */
 public class ControllerImpl implements Controller {
-
   private final ModelImpl model;
 
   /**
-   * Constructs the ControllerImpl with a ModelFactory, board size, and player names.
+   * Constructeur du contrôleur.
    *
-   * @param mf factory to create the game model
-   * @param baseSize star board size parameter
-   * @param names player names or "AI"
-   * @throws IllegalArgumentException if mf is null
+   * @param modelFactory usine pour créer le modèle du jeu
+   * @param baseSize     taill du plateau
+   * @param playerNames  noms des joeurs
+   * @throws IllegalArgumentException modelFactory is null
    */
-  public ControllerImpl(ModelFactory mf, int baseSize, String[] names) {
-    if (mf == null) {
+  public ControllerImpl(ModelFactory modelFactory, int baseSize, String[] playerNames) {
+    if (modelFactory == null) {
       throw new IllegalArgumentException("ModelFactory cannot be null");
     }
-    this.model = (ModelImpl) mf.createModel(baseSize, names);
+    // Créer le modèle
+    this.model = (ModelImpl) modelFactory.createModel(baseSize, playerNames);
   }
 
   @Override
@@ -42,24 +42,28 @@ public class ControllerImpl implements Controller {
 
   @Override
   public List<Move> getPlayerMoves() {
-    Set<ca.uqam.info.solanum.inf2050.f24halma.model.Field> fields =
-        model.getPlayerFields(model.getCurrentPlayer());
+    // Récupération des positions des pions
+    Set<Field> fields = model.getPlayerFields(model.getCurrentPlayer());
+    // Stocker les mouvements
     List<Move> moves = new ArrayList<>();
-    for (ca.uqam.info.solanum.inf2050.f24halma.model.Field f : fields) {
-      for (ca.uqam.info.solanum.inf2050.f24halma.model.Field n :
-          model.getBoard().getNeighbours(f)) {
+    // Pour chaque pion, on teste les voisins
+    for (Field originField : fields) {
+      // Parcours les voisins immédiats
+      for (Field neighbourField : model.getBoard().getNeighbours(originField)) {
         try {
-          if (model.isClear(n)) {
-            moves.add(new Move(f, n, false));
+          // Case vide = déplacement simple
+          if (model.isClear(neighbourField)) {
+            moves.add(new Move(originField, neighbourField, false));
           } else {
-            ca.uqam.info.solanum.inf2050.f24halma.model.Field j =
-                model.getBoard().getExtendedNeighbour(f, n);
-            if (j != null && model.isClear(j)) {
-              moves.add(new Move(f, j, true));
+            // Tentative de saut
+            Field jumpField = model.getBoard().getExtendedNeighbour(originField, neighbourField);
+            // Saut possible et case libre
+            if (jumpField != null && model.isClear(jumpField)) {
+              moves.add(new Move(originField, jumpField, true));
             }
           }
-        } catch (FieldException ex) {
-          // ignore invalid neighbour
+        } catch (FieldException e) {
+          // Ignore neighbours invalide
         }
       }
     }
@@ -67,20 +71,24 @@ public class ControllerImpl implements Controller {
   }
 
   @Override
-  public void performMove(Move m) {
+  public void performMove(Move move) {
     try {
-      model.occupyField(model.getCurrentPlayer(), m.target());
-      model.clearField(m.origin());
-    } catch (FieldException | ModelAccessConsistencyException ex) {
-      throw new IllegalMoveException("Cannot perform move: " + ex.getMessage());
+      // Place le pion du joueur sur la case target
+      model.occupyField(model.getCurrentPlayer(), move.target());
+      // Vide la case d'origine
+      model.clearField(move.origin());
+    } catch (FieldException | ModelAccessConsistencyException e) {
+      throw new IllegalMoveException("Impossible d'effectuer le mouvement " + e.getMessage());
     }
   }
 
   @Override
   public boolean isGameOver() {
+    // Vérifier chaque joueur
     for (int i = 0; i < model.getPlayerNames().length; i++) {
       Set<ca.uqam.info.solanum.inf2050.f24halma.model.Field> target =
           model.getBoard().getTargetFieldsForPlayer(i);
+      // Fin de partie = tous les pions sont sur les targetFields
       if (target.containsAll(model.getPlayerFields(i))) {
         return true;
       }

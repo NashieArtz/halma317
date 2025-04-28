@@ -33,10 +33,12 @@ public class ModelImpl implements Model, ModelReadOnly {
     this.board = new BoardImpl(baseSize);
     this.playerNames = playerNames.clone();
     this.occupant = new int[4 * baseSize + 1][6 * baseSize + 1];
+    // Initialise toutes les cases vides
     for (int[] row : occupant) {
       Arrays.fill(row, -1);
     }
     this.currentPlayer = 0;
+    // Place les pions dans homefield
     for (int p = 0; p < playerNames.length; p++) {
       for (Field f : board.getHomeFieldsForPlayer(p)) {
         occupant[f.x()][f.y()] = p;
@@ -45,21 +47,24 @@ public class ModelImpl implements Model, ModelReadOnly {
   }
 
   @Override
-  public void occupyField(int playerNum, Field field) throws FieldException {
+  public void occupyField(int playerIndex, Field field) throws FieldException {
     if (!board.getAllFields().contains(field)) {
-      throw new FieldException("Invalid field: " + field);
+      throw new FieldException("Field Invalide: " + field);
     }
-    occupant[field.x()][field.y()] = playerNum;
+    occupant[field.x()][field.y()] = playerIndex;
   }
 
   @Override
   public void clearField(Field field) throws FieldException, ModelAccessConsistencyException {
+    // Vérification du field dans le plateau
     if (!board.getAllFields().contains(field)) {
-      throw new FieldException("Invalid field: " + field);
+      throw new FieldException("Field Invalide: " + field);
     }
+    // Vérification d'un pion présent avant de le retirer
     if (occupant[field.x()][field.y()] < 0) {
-      throw new ModelAccessConsistencyException("Field not occupied: " + field);
+      throw new ModelAccessConsistencyException("Field non occupé: " + field);
     }
+    // Retirer le pion
     occupant[field.x()][field.y()] = -1;
   }
 
@@ -80,6 +85,7 @@ public class ModelImpl implements Model, ModelReadOnly {
   @Override
   public Set<Field> getPlayerFields(int playerIndex) {
     Set<Field> result = new HashSet<>();
+    // Parcourir les cases du plateau et ajouter le field si appartient au joueur
     for (Field f : board.getAllFields()) {
       if (occupant[f.x()][f.y()] == playerIndex) {
         result.add(f);
@@ -101,8 +107,9 @@ public class ModelImpl implements Model, ModelReadOnly {
   @Override
   public boolean isClear(Field field) throws FieldException {
     if (!board.getAllFields().contains(field)) {
-      throw new FieldException("Invalid field: " + field);
+      throw new FieldException("Field Invalide: " + field);
     }
+    // Field clear si occupant < 0
     return occupant[field.x()][field.y()] < 0;
   }
 
@@ -115,6 +122,7 @@ public class ModelImpl implements Model, ModelReadOnly {
       return false;
     }
     ModelImpl that = (ModelImpl) o;
+    // Comparer al grille d'occupation, plateau et noms
     return Arrays.deepEquals(occupant, that.occupant)
         && Objects.equals(board, that.board)
         && Arrays.equals(playerNames, that.playerNames);
@@ -123,6 +131,7 @@ public class ModelImpl implements Model, ModelReadOnly {
   @Override
   public int hashCode() {
     int result = Objects.hash(board, Arrays.hashCode(playerNames));
+    // Ajouter hashcode du tableau occupant
     result = 31 * result + Arrays.deepHashCode(occupant);
     return result;
   }
